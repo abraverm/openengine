@@ -1,0 +1,25 @@
+---
+SizeConverter:
+  parameters:
+    from:
+      type: string
+    to:
+      type: string
+  logic: http://.../size_converter.yaml
+JsonFirst:
+  parameters:
+    data:
+      type: string
+  logic: http://.../json_first.yaml
+JsonPath:
+  parameters:
+    data:
+      type: string
+    path:
+      type: string
+  logic: http://.../json_path.yaml
+NameGenerator:
+  parameters:
+    random:
+      type: boolean
+  logic: http://.../name_generator.yaml

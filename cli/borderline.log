@@ -1,0 +1,213 @@
+Aug  3 11:32:49.770[31m [ERRO] [0mfuck
+Aug  3 11:33:08.984[31m [ERRO] [0mfuck
+Aug  3 11:33:32.682[31m [ERRO] [0mfuck
+Aug  3 11:33:47.375[31m [ERRO] [0mlinchpin.yaml
+Aug  3 11:34:20.174[31m [ERRO] [0mprovider.yaml
+Aug  3 11:34:30.532[31m [ERRO] [0mprovider.yaml
+Aug  3 11:35:04.886[31m [ERRO] [0mlinchpin.yaml
+Aug  3 11:35:04.886[31m [ERRO] [0mlinchpin.yaml
+Aug  3 11:35:39.448[31m [ERRO] [0mlinchpin.yaml
+Aug  3 11:35:39.448[31m [ERRO] [0m---
+Server:
+  create:
+    providers:
+      - match:
+          type: enum('Openstack')
+        parameters: ['name', 'flavorRef', 'imageRef', 'key_name']
+        logic: |
+          cat << EOF > PinFile
+          simple:
+            topology:
+              topology_name: simple
+              resource_groups:
+                - resource_group_name: new
+                  resource_group_type: openstack
+                  resource_definitions:
+                    - name: {{ name }}
+                      role: os_server
+                      flavor: {{ flavorRef }}
+                      image: {{ imageRef }}
+                      keypair: {{ key_name }}
+          EOF
+          linchpin up
+Aug  3 11:35:39.449[31m [ERRO] [0mlinchpin.yaml
+Aug  3 11:36:19.693[31m [ERRO] [0mlinchpin.yaml
+Aug  3 11:36:19.693[31m [ERRO] [0mmap[Server:{map[] []}]
+Aug  3 11:36:19.693[31m [ERRO] [0mlinchpin.yaml
+Aug  3 11:37:37.193[31m [ERRO] [0m[3:3] unknown field "create"
+       1 | ---
+       2 | Server:
+    >  3 |   create:
+             ^
+       4 |     providers:
+       5 |       - match:
+       6 |           type: enum('Openstack')
+       7 |         
+Aug  3 11:37:37.193[31m [FATA] [0m[3:3] unknown field "create"
+       1 | ---
+       2 | Server:
+    >  3 |   create:
+             ^
+       4 |     providers:
+       5 |       - match:
+       6 |           type: enum('Openstack')
+       7 |         
+Aug  3 11:38:01.300[31m [FATA] [0m[3:3] unknown field "create"
+       1 | ---
+       2 | Server:
+    >  3 |   create:
+             ^
+       4 |     providers:
+       5 |       - match:
+       6 |           type: enum('Openstack')
+       7 |         
+Aug  3 11:39:28.257[31m [FATA] [0m[3:3] unknown field "parameters"
+       1 | ---
+       2 | SizeConverter:
+    >  3 |   parameters:
+             ^
+       4 |     from: str()
+       5 |     to: str()
+       6 |   logic: http://.../size_converter.yaml
+       7 | 
+Aug  3 11:39:35.324[31m [FATA] [0m[3:3] unknown field "parameters"
+       1 | ---
+       2 | SizeConverter:
+    >  3 |   parameters:
+             ^
+       4 |     from: str()
+       5 |     to: str()
+       6 |   logic: http://.../size_converter.yaml
+       7 | 
+Aug  3 14:16:34.653[31m [FATA] [0mFailed to parse 'tools.yaml':
+Mapping node doesn't ArrayNode:
+    github.com/goccy/go-yaml.(*Decoder).getArrayNode
+        /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:325
+Aug  3 14:19:07.053[31m [FATA] [0m[3:3] unknown field "create"
+       1 | ---
+       2 | Server:
+    >  3 |   create:
+             ^
+       4 |     providers:
+       5 |       - match:
+       6 |           type: enum('Openstack')
+       7 |         
+Aug  4 16:54:46.122[31m [FATA] [0mReference /70d62b95d845b5019c9eb90459c1c6262f023ad60790bde084dd39266f9fcfca must be canonical
+Aug  4 17:03:24.149[31m [FATA] [0mReference file://70d62b95d845b5019c9eb90459c1c6262f023ad60790bde084dd39266f9fcfca must be canonical
+Aug  4 17:03:43.041[31m [FATA] [0mReference file://70d62b95d845b5019c9eb90459c1c6262f023ad60790bde084dd39266f9fcfca must be canonical
+Aug  4 17:03:57.526[31m [FATA] [0mGet "http://70d62b95d845b5019c9eb90459c1c6262f023ad60790bde084dd39266f9fcfca": dial tcp: lookup 70d62b95d845b5019c9eb90459c1c6262f023ad60790bde084dd39266f9fcfca: no such host
+Aug  4 17:06:39.951[31m [FATA] [0mopen /70d62b95d845b5019c9eb90459c1c6262f023ad60790bde084dd39266f9fcfca: no such file or directory
+Aug  4 17:22:03.426[31m [FATA] [0mopen /70d62b95d845b5019c9eb90459c1c6262f023ad60790bde084dd39266f9fcfca/a: no such file or directory
+Aug  4 17:24:04.915[31m [FATA] [0mopen /70d62b95d845b5019c9eb90459c1c6262f023ad60790bde084dd39266f9fcfca: no such file or directory
+Aug  4 17:26:00.240[31m [FATA] [0mopen /21babde2984cc6b2d4fb79e392068c337d86b485c8f4f1a33dc0218aeafb9f72: no such file or directory
+Aug  4 17:26:46.817[31m [FATA] [0mopen /21babde2984cc6b2d4fb79e392068c337d86b485c8f4f1a33dc0218aeafb9f72: no such file or directory
+Aug  4 17:28:12.012[31m [FATA] [0mopen /70d62b95d845b5019c9eb90459c1c6262f023ad60790bde084dd39266f9fcfca: no such file or directory
+Aug  4 17:28:49.048[31m [FATA] [0mopen /70d62b95d845b5019c9eb90459c1c6262f023ad60790bde084dd39266f9fcfca: no such file or directory
+Aug  4 17:31:17.269[31m [FATA] [0mopen /70d62b95d845b5019c9eb90459c1c6262f023ad60790bde084dd39266f9fcfca: no such file or directory
+Aug  4 17:31:50.291[31m [FATA] [0mReference http:///70d62b95d845b5019c9eb90459c1c6262f023ad60790bde084dd39266f9fcfca must be canonical
+Aug  4 17:32:15.888[31m [FATA] [0mGet "http://70d62b95d845b5019c9eb90459c1c6262f023ad60790bde084dd39266f9fcfca": dial tcp: lookup 70d62b95d845b5019c9eb90459c1c6262f023ad60790bde084dd39266f9fcfca: no such host
+Aug  4 17:32:35.892[31m [FATA] [0mCould not read schema from HTTP, response status is 404 Not Found
+Aug  4 18:11:57.534[31m [FATA] [0mopen /70d62b95d845b5019c9eb90459c1c6262f023ad60790bde084dd39266f9fcfca: no such file or directory
+Aug  4 18:13:09.919[31m [FATA] [0mopen /70d62b95d845b5019c9eb90459c1c6262f023ad60790bde084dd39266f9fcfca: no such file or directory
+Aug  4 18:13:32.783[31m [FATA] [0mopen /70d62b95d845b5019c9eb90459c1c6262f023ad60790bde084dd39266f9fcfca: no such file or directory
+Aug  4 18:24:55.376[31m [FATA] [0mopen /70d62b95d845b5019c9eb90459c1c6262f023ad60790bde084dd39266f9fcfca: no such file or directory
+Aug  4 18:33:21.413[31m [FATA] [0mopen /70d62b95d845b5019c9eb90459c1c6262f023ad60790bde084dd39266f9fcfca: no such file or directory
+Aug  4 18:33:44.210[31m [FATA] [0mopen /70d62b95d845b5019c9eb90459c1c6262f023ad60790bde084dd39266f9fcfca: no such file or directory
+Aug  4 20:24:52.594[31m [FATA] [0mopen /52133ddfcd583280388a8bbfb67a417b6b660f75bc63ec1b01beec811d4498ef: no such file or directory
+Aug  4 20:26:02.000[31m [FATA] [0mopen /52133ddfcd583280388a8bbfb67a417b6b660f75bc63ec1b01beec811d4498ef: no such file or directory
+Aug  4 20:26:43.000[31m [FATA] [0mopen /52133ddfcd583280388a8bbfb67a417b6b660f75bc63ec1b01beec811d4498ef: no such file or directory
+Aug  4 20:27:02.249[31m [FATA] [0mopen /52133ddfcd583280388a8bbfb67a417b6b660f75bc63ec1b01beec811d4498ef: no such file or directory
+Aug  4 20:28:30.502[31m [FATA] [0mopen /52133ddfcd583280388a8bbfb67a417b6b660f75bc63ec1b01beec811d4498ef: no such file or directory
+Aug  4 20:30:00.917[31m [FATA] [0mopen /52133ddfcd583280388a8bbfb67a417b6b660f75bc63ec1b01beec811d4498ef: no such file or directory
+Aug  4 20:31:03.798[31m [FATA] [0mhas a primitive type that is NOT VALID -- given: /enum('Openstack')/ Expected valid values are:[array boolean integer number null object string]
+Aug  4 20:31:56.227[31m [FATA] [0mhas a primitive type that is NOT VALID -- given: /enum('Openstack')/ Expected valid values are:[array boolean integer number null object string]
+Aug  5 13:12:53.297[31m [FATA] [0m[(root): Invalid type. Expected: string, given: object (root): Invalid type. Expected: string, given: object (root): Must validate all the schemas (allOf)]
+Aug  5 13:17:08.045[31m [FATA] [0m[(root): Invalid type. Expected: string, given: object (root): Invalid type. Expected: string, given: object (root): Must validate all the schemas (allOf)]
+Aug  5 13:18:05.630[31m [FATA] [0m[(root): Invalid type. Expected: string, given: object (root): Invalid type. Expected: string, given: object (root): Must validate all the schemas (allOf)]
+Aug  5 13:19:49.606[31m [FATA] [0m[(root): Invalid type. Expected: string, given: object (root): Invalid type. Expected: string, given: object (root): Must validate all the schemas (allOf)]
+Aug  5 13:20:07.474[31m [FATA] [0m[(root): Invalid type. Expected: string, given: object (root): Invalid type. Expected: string, given: object (root): Must validate all the schemas (allOf)]
+Aug  5 13:20:34.386[31m [FATA] [0m[(root): Invalid type. Expected: string, given: object (root): Invalid type. Expected: string, given: object (root): Must validate all the schemas (allOf)]
+Aug  5 13:21:01.111[31m [FATA] [0m[(root): Invalid type. Expected: string, given: object (root): Invalid type. Expected: string, given: object (root): Must validate all the schemas (allOf)]
+Aug  5 13:21:53.703[31m [FATA] [0m[(root): Invalid type. Expected: string, given: object (root): Invalid type. Expected: string, given: object (root): Must validate all the schemas (allOf)]
+Aug  5 13:22:13.310[31m [FATA] [0m[(root): Invalid type. Expected: string, given: object (root): Invalid type. Expected: string, given: object (root): Must validate all the schemas (allOf)]
+Aug  5 13:22:47.232[31m [FATA] [0m[(root): Invalid type. Expected: string, given: object (root): Invalid type. Expected: string, given: object (root): Must validate all the schemas (allOf)]
+Aug  5 13:23:20.141[31m [FATA] [0m[(root): Invalid type. Expected: string, given: object (root): Invalid type. Expected: string, given: object (root): Must validate all the schemas (allOf)]
+Aug  5 17:16:03.330[31m [FATA] [0mcannot unmarshal map[string]interface {} into Go struct field .Implicit of type string
+Aug  5 17:21:30.205[31m [FATA] [0mcannot unmarshal map[string]interface {} into Go struct field .Implicit of type string
+Aug  5 17:22:04.770[31m [FATA] [0mcannot unmarshal map[string]interface {} into Go struct field .Implicit of type string
+Aug  5 17:23:35.651[31m [FATA] [0mcannot unmarshal map[string]interface {} into Go struct field .Implicit of type string
+Aug  5 17:24:18.201[31m [FATA] [0mcannot unmarshal map[string]interface {} into Go struct field .Providers of type string
+Aug  5 17:25:05.393[31m [FATA] [0mString node doesn't MapNode:
+    github.com/goccy/go-yaml.(*Decoder).getMapNode
+        /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:295
+Aug  5 17:26:26.726[31m [FATA] [0mString node doesn't MapNode:
+    github.com/goccy/go-yaml.(*Decoder).getMapNode
+        /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:295
+Aug  5 17:27:49.848[31m [FATA] [0mString node doesn't MapNode:
+    github.com/goccy/go-yaml.(*Decoder).getMapNode
+        /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:295
+Aug  5 17:27:59.911[31m [FATA] [0mString node doesn't MapNode:
+    github.com/goccy/go-yaml.(*Decoder).getMapNode
+        /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:295
+Aug  5 17:28:50.724[31m [FATA] [0mcannot unmarshal map[string]interface {} into Go struct field .Implicit of type string
+Aug  5 20:47:42.663[31m [FATA] [0mString node doesn't MapNode:
+    github.com/goccy/go-yaml.(*Decoder).getMapNode
+        /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:295
+Aug  5 20:49:31.479[31m [FATA] [0mString node doesn't MapNode:
+    github.com/goccy/go-yaml.(*Decoder).getMapNode
+        /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:295
+Aug  5 20:52:02.444[31m [FATA] [0mString node doesn't MapNode:
+    github.com/goccy/go-yaml.(*Decoder).getMapNode
+        /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:295
+Aug  5 20:53:34.479[31m [FATA] [0mString node doesn't MapNode:
+    github.com/goccy/go-yaml.(*Decoder).getMapNode
+        /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:295
+Aug  5 20:54:57.305[31m [FATA] [0m[33:15] unknown field "store"
+      30 |               args:
+      31 |                 from: $_memory
+      32 |                 to: MiB
+    > 33 |               store: $_memory
+                         ^
+      34 |             - resource: SizeConverter
+      35 |               action: get
+      36 |               args:
+Aug  5 20:55:34.445[31m [FATA] [0m[29:15] unknown field "action"
+      26 |             type: string
+      27 |           implicit:
+      28 |             - resource: SizeConverter
+    > 29 |               action: get
+                         ^
+      30 |               args:
+      31 |                 from: $_memory
+      32 |                 to: MiB
+      33 |               
+Aug  6 11:16:47.959[31m [FATA] [0mMapping node doesn't ArrayNode:
+    github.com/goccy/go-yaml.(*Decoder).getArrayNode
+        /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:325
+Aug  6 11:17:19.226[31m [FATA] [0mMapping node doesn't ArrayNode:
+    github.com/goccy/go-yaml.(*Decoder).getArrayNode
+        /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:325
+Aug  6 11:18:12.413[31m [FATA] [0mMapping node doesn't ArrayNode:
+    github.com/goccy/go-yaml.(*Decoder).getArrayNode
+        /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:325
+Aug  6 11:18:37.967[31m [FATA] [0mMapping node doesn't ArrayNode:
+    github.com/goccy/go-yaml.(*Decoder).getArrayNode
+        /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:325
+Aug  6 11:18:49.909[31m [FATA] [0mMapping node doesn't ArrayNode:
+    github.com/goccy/go-yaml.(*Decoder).getArrayNode
+        /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:325
+Aug  6 11:19:32.894[31m [FATA] [0mMapping node doesn't ArrayNode:
+    github.com/goccy/go-yaml.(*Decoder).getArrayNode
+        /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:325
+Aug  6 11:19:42.000[31m [FATA] [0mMapping node doesn't ArrayNode:
+    github.com/goccy/go-yaml.(*Decoder).getArrayNode
+        /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:325
+Aug  6 11:19:50.840[31m [FATA] [0mMapping node doesn't ArrayNode:
+    github.com/goccy/go-yaml.(*Decoder).getArrayNode
+        /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:325
+Aug  6 11:20:00.869[31m [FATA] [0mMapping node doesn't ArrayNode:
+    github.com/goccy/go-yaml.(*Decoder).getArrayNode
+        /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:325
+Aug  6 11:20:12.240[31m [FATA] [0mMapping node doesn't ArrayNode:
+    github.com/goccy/go-yaml.(*Decoder).getArrayNode
+        /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:325

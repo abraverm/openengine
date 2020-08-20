@@ -1,0 +1,25 @@
+---
+Server:
+  create:
+    - match:
+        type: object
+        properties:
+          providerType:
+            type: string
+      parameters:
+        type: object
+        properties:
+          name:
+            type: string
+          flavorRef:
+            type: string
+          imageRef:
+            type: string
+          key_name:
+            type: string
+        required:
+          - name
+          - flavorRef
+          - imageRef
+          - key_name
+      logic: linchpin_openstack_create.tmpl
