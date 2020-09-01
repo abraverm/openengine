@@ -211,3 +211,565 @@ Aug  6 11:20:00.869[31m [FATA] [0mMapping node doesn't ArrayNode:
 Aug  6 11:20:12.240[31m [FATA] [0mMapping node doesn't ArrayNode:
     github.com/goccy/go-yaml.(*Decoder).getArrayNode
         /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:325
+Aug 25 10:14:12.057[31m [FATA] [0mString node doesn't MapNode:
+    github.com/goccy/go-yaml.(*Decoder).getMapNode
+        /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:295
+Aug 25 10:18:02.192[31m [FATA] [0mUnable to create engine: String node doesn't MapNode:
+    github.com/goccy/go-yaml.(*Decoder).getMapNode
+        /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:295
+Aug 25 10:18:40.603[31m [FATA] [0mUnable to create engine:
+String node doesn't MapNode:
+    github.com/goccy/go-yaml.(*Decoder).getMapNode
+        /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:295
+Aug 25 10:52:15.966[31m [ERRO] [0munable to parse provider.yaml as a provider:
+ String node doesn't MapNode:
+    github.com/goccy/go-yaml.(*Decoder).getMapNode
+        /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:295
+Aug 25 10:52:15.973[31m [ERRO] [0munable to parse linchpin.yaml as a provisioner:
+ [2:1] unknown field "Server"
+       1 | ---
+    >  2 | Server:
+           ^
+       3 |   create:
+       4 |     - match:
+       5 |         type: object
+       6 |         
+Aug 25 10:52:15.973[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 10:56:28.364[31m [ERRO] [0munable to parse provider.yaml as a provider:
+ String node doesn't MapNode:
+    github.com/goccy/go-yaml.(*Decoder).getMapNode
+        /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:295
+Aug 25 10:56:28.364[31m [ERRO] [0munable to parse linchpin.yaml as a provisioner:
+ [2:1] unknown field "Server"
+       1 | ---
+    >  2 | Server:
+           ^
+       3 |   create:
+       4 |     - match:
+       5 |         type: object
+       6 |         
+Aug 25 10:56:28.365[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 10:56:47.514[31m [ERRO] [0munable to parse linchpin.yaml as a provisioner:
+ [2:1] unknown field "Server"
+       1 | ---
+    >  2 | Server:
+           ^
+       3 |   create:
+       4 |     - match:
+       5 |         type: object
+       6 |         
+Aug 25 10:56:47.514[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 10:57:06.286[31m [ERRO] [0munable to parse linchpin.yaml as a provisioner:
+ [2:1] unknown field "Server"
+       1 | ---
+    >  2 | Server:
+           ^
+       3 |   create:
+       4 |     - match:
+       5 |         type: object
+       6 |         
+Aug 25 10:57:06.286[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 10:57:28.672[31m [ERRO] [0munable to parse provider.yaml as a provider:
+ String node doesn't MapNode:
+    github.com/goccy/go-yaml.(*Decoder).getMapNode
+        /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:295
+Aug 25 10:57:28.672[31m [ERRO] [0munable to parse linchpin.yaml as a provisioner:
+ [2:1] unknown field "Server"
+       1 | ---
+    >  2 | Server:
+           ^
+       3 |   create:
+       4 |     - match:
+       5 |         type: object
+       6 |         
+Aug 25 10:57:28.672[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 10:58:48.980[31m [ERRO] [0munable to parse linchpin.yaml as a provisioner:
+ [2:1] unknown field "Server"
+       1 | ---
+    >  2 | Server:
+           ^
+       3 |   create:
+       4 |     - match:
+       5 |         type: object
+       6 |         
+Aug 25 10:58:48.980[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 10:59:02.220[31m [ERRO] [0munable to parse provider.yaml as a provider:
+ String node doesn't MapNode:
+    github.com/goccy/go-yaml.(*Decoder).getMapNode
+        /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:295
+Aug 25 10:59:02.220[31m [ERRO] [0munable to parse linchpin.yaml as a provisioner:
+ [2:1] unknown field "Server"
+       1 | ---
+    >  2 | Server:
+           ^
+       3 |   create:
+       4 |     - match:
+       5 |         type: object
+       6 |         
+Aug 25 10:59:02.220[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 11:16:08.655[31m [ERRO] [0munable to parse provider.yaml as a provider:
+ String node doesn't MapNode:
+    github.com/goccy/go-yaml.(*Decoder).getMapNode
+        /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:295
+Aug 25 11:16:08.655[31m [ERRO] [0munable to parse linchpin.yaml as a provisioner:
+ [2:1] unknown field "Server"
+       1 | ---
+    >  2 | Server:
+           ^
+       3 |   create:
+       4 |     - match:
+       5 |         type: object
+       6 |         
+Aug 25 11:16:08.655[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 11:16:28.962[31m [ERRO] [0munable to parse provider.yaml as a provider:
+ String node doesn't MapNode:
+    github.com/goccy/go-yaml.(*Decoder).getMapNode
+        /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:295
+Aug 25 11:16:28.962[31m [ERRO] [0munable to parse linchpin.yaml as a provisioner:
+ [2:1] unknown field "Server"
+       1 | ---
+    >  2 | Server:
+           ^
+       3 |   create:
+       4 |     - match:
+       5 |         type: object
+       6 |         
+Aug 25 11:16:28.962[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 11:22:43.286[31m [ERRO] [0munable to parse provider.yaml as a provider:
+ String node doesn't MapNode:
+    github.com/goccy/go-yaml.(*Decoder).getMapNode
+        /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:295
+Aug 25 11:22:43.286[31m [ERRO] [0munable to parse linchpin.yaml as a provisioner:
+ [2:1] unknown field "Server"
+       1 | ---
+    >  2 | Server:
+           ^
+       3 |   create:
+       4 |     - match:
+       5 |         type: object
+       6 |         
+Aug 25 11:22:43.286[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 11:23:02.071[31m [ERRO] [0munable to parse provider.yaml as a provider:
+ String node doesn't MapNode:
+    github.com/goccy/go-yaml.(*Decoder).getMapNode
+        /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:295
+Aug 25 11:23:02.071[31m [ERRO] [0munable to parse linchpin.yaml as a provisioner:
+ [2:1] unknown field "Server"
+       1 | ---
+    >  2 | Server:
+           ^
+       3 |   create:
+       4 |     - match:
+       5 |         type: object
+       6 |         
+Aug 25 11:23:02.071[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 11:23:43.143[31m [ERRO] [0munable to parse linchpin.yaml as a provisioner:
+ [2:1] unknown field "Server"
+       1 | ---
+    >  2 | Server:
+           ^
+       3 |   create:
+       4 |     - match:
+       5 |         type: object
+       6 |         
+Aug 25 11:24:21.088[31m [ERRO] [0munable to parse provider.yaml as a provider:
+ [29:15] unknown field "args"
+      26 |           explicit:
+      27 |             type: string
+      28 |           implicit:
+    > 29 |             - args:
+                         ^
+      30 |                 from: $_memory
+      31 |                 to: MiB
+      32 |               store: $_memory
+Aug 25 11:24:21.088[31m [ERRO] [0munable to parse linchpin.yaml as a provisioner:
+ [2:1] unknown field "Server"
+       1 | ---
+    >  2 | Server:
+           ^
+       3 |   create:
+       4 |     - match:
+       5 |         type: object
+       6 |         
+Aug 25 11:24:21.088[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 11:26:44.008[31m [ERRO] [0munable to parse provider.yaml as a provider:
+ String node doesn't MapNode:
+    github.com/goccy/go-yaml.(*Decoder).getMapNode
+        /home/abraverm/src/go/pkg/mod/github.com/goccy/go-yaml@v1.8.0/decode.go:295
+Aug 25 11:26:44.008[31m [ERRO] [0munable to parse linchpin.yaml as a provisioner:
+ [2:1] unknown field "Server"
+       1 | ---
+    >  2 | Server:
+           ^
+       3 |   create:
+       4 |     - match:
+       5 |         type: object
+       6 |         
+Aug 25 11:26:44.008[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 11:27:00.840[31m [ERRO] [0munable to parse provider.yaml as a provider:
+ [29:15] unknown field "name"
+      26 |           explicit:
+      27 |             type: string
+      28 |           implicit:
+    > 29 |             - name: SizeConverter
+                         ^
+      30 |               args:
+      31 |                 from: $_memory
+      32 |                 to: MiB
+      33 |               
+Aug 25 11:27:00.840[31m [ERRO] [0munable to parse linchpin.yaml as a provisioner:
+ [2:1] unknown field "Server"
+       1 | ---
+    >  2 | Server:
+           ^
+       3 |   create:
+       4 |     - match:
+       5 |         type: object
+       6 |         
+Aug 25 11:27:00.840[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 11:27:16.194[31m [FATA] [0mUnable to parse DSL file:
+[11:5] unknown field "resource"
+   8 | tools:
+   9 |   - tools.yaml
+  10 | resources:
+> 11 |   - resource: Server
+           ^
+  12 |     args:
+  13 |       _memory: 4g
+  14 |       imageRef: Fedora-31
+  15 |       
+Aug 25 11:28:01.756[31m [FATA] [0mUnable to parse DSL file:
+[11:5] unknown field "resource"
+   8 | tools:
+   9 |   - tools.yaml
+  10 | resources:
+> 11 |   - resource: Server
+           ^
+  12 |     args:
+  13 |       _memory: 4g
+  14 |       imageRef: Fedora-31
+  15 |       
+Aug 25 11:28:31.208[31m [ERRO] [0munable to parse provider.yaml as a provider:
+ [29:15] unknown field "name"
+      26 |           explicit:
+      27 |             type: string
+      28 |           implicit:
+    > 29 |             - name: SizeConverter
+                         ^
+      30 |               args:
+      31 |                 from: $_memory
+      32 |                 to: MiB
+      33 |               
+Aug 25 11:28:31.208[31m [ERRO] [0munable to parse linchpin.yaml as a provisioner:
+ [2:1] unknown field "Server"
+       1 | ---
+    >  2 | Server:
+           ^
+       3 |   create:
+       4 |     - match:
+       5 |         type: object
+       6 |         
+Aug 25 11:28:31.208[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 11:28:55.291[31m [ERRO] [0munable to parse provider.yaml as a provider:
+ [29:15] unknown field "name"
+      26 |           explicit:
+      27 |             type: string
+      28 |           implicit:
+    > 29 |             - name: SizeConverter
+                         ^
+      30 |               args:
+      31 |                 from: $_memory
+      32 |                 to: MiB
+      33 |               
+Aug 25 11:28:55.291[31m [ERRO] [0munable to parse linchpin.yaml as a provisioner:
+ [2:1] unknown field "Server"
+       1 | ---
+    >  2 | Server:
+           ^
+       3 |   create:
+       4 |     - match:
+       5 |         type: object
+       6 |         
+Aug 25 11:28:55.291[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 11:30:46.053[31m [ERRO] [0munable to parse provider.yaml as a provider:
+ [29:15] unknown field "resource"
+      26 |           explicit:
+      27 |             type: string
+      28 |           implicit:
+    > 29 |             - resource: SizeConverter
+                         ^
+      30 |               args:
+      31 |                 from: $_memory
+      32 |                 to: MiB
+      33 |               
+Aug 25 11:30:46.053[31m [ERRO] [0munable to parse linchpin.yaml as a provisioner:
+ [2:1] unknown field "Server"
+       1 | ---
+    >  2 | Server:
+           ^
+       3 |   create:
+       4 |     - match:
+       5 |         type: object
+       6 |         
+Aug 25 11:30:46.053[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 11:34:08.810[31m [ERRO] [0munable to parse provider.yaml as a provider:
+ [29:15] unknown field "resource"
+      26 |           explicit:
+      27 |             type: string
+      28 |           implicit:
+    > 29 |             - resource: SizeConverter
+                         ^
+      30 |               args:
+      31 |                 from: $_memory
+      32 |                 to: MiB
+      33 |               
+Aug 25 11:34:08.810[31m [ERRO] [0munable to parse linchpin.yaml as a provisioner:
+ [2:1] unknown field "Server"
+       1 | ---
+    >  2 | Server:
+           ^
+       3 |   create:
+       4 |     - match:
+       5 |         type: object
+       6 |         
+Aug 25 11:34:08.810[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 11:36:04.544[31m [ERRO] [0munable to parse provider.yaml as a provider:
+ [29:15] unknown field "resource"
+      26 |           explicit:
+      27 |             type: string
+      28 |           implicit:
+    > 29 |             - resource: SizeConverter
+                         ^
+      30 |               args:
+      31 |                 from: $_memory
+      32 |                 to: MiB
+      33 |               
+Aug 25 11:36:04.544[31m [ERRO] [0munable to parse linchpin.yaml as a provisioner:
+ [2:1] unknown field "Server"
+       1 | ---
+    >  2 | Server:
+           ^
+       3 |   create:
+       4 |     - match:
+       5 |         type: object
+       6 |         
+Aug 25 11:36:04.544[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 11:36:18.244[31m [ERRO] [0munable to parse provider.yaml as a provider:
+ [29:15] unknown field "resource"
+      26 |           explicit:
+      27 |             type: string
+      28 |           implicit:
+    > 29 |             - resource: SizeConverter
+                         ^
+      30 |               args:
+      31 |                 from: $_memory
+      32 |                 to: MiB
+      33 |               
+Aug 25 11:36:18.244[31m [ERRO] [0munable to parse linchpin.yaml as a provisioner:
+ [2:1] unknown field "Server"
+       1 | ---
+    >  2 | Server:
+           ^
+       3 |   create:
+       4 |     - match:
+       5 |         type: object
+       6 |         
+Aug 25 11:36:18.244[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 11:36:57.331[31m [ERRO] [0munable to parse provider.yaml as a provider:
+ [29:15] unknown field "resource"
+      26 |           explicit:
+      27 |             type: string
+      28 |           implicit:
+    > 29 |             - resource: SizeConverter
+                         ^
+      30 |               args:
+      31 |                 from: $_memory
+      32 |                 to: MiB
+      33 |               
+Aug 25 11:36:57.331[31m [ERRO] [0munable to parse linchpin.yaml as a provisioner:
+ [2:1] unknown field "Server"
+       1 | ---
+    >  2 | Server:
+           ^
+       3 |   create:
+       4 |     - match:
+       5 |         type: object
+       6 |         
+Aug 25 11:36:57.331[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 11:37:10.072[31m [FATA] [0mUnable to parse DSL file:
+[11:5] unknown field "resource"
+   8 | tools:
+   9 |   - tools.yaml
+  10 | resources:
+> 11 |   - resource: Server
+           ^
+  12 |     args:
+  13 |       _memory: 4g
+  14 |       imageRef: Fedora-31
+  15 |       
+Aug 25 11:37:45.436[31m [FATA] [0mUnable to parse DSL file:
+[11:5] unknown field "resource"
+   8 | tools:
+   9 |   - tools.yaml
+  10 | resources:
+> 11 |   - resource: Server
+           ^
+  12 |     args:
+  13 |       _memory: 4g
+  14 |       imageRef: Fedora-31
+  15 |       
+Aug 25 11:38:10.827[31m [ERRO] [0munable to parse provider.yaml as a provider:
+ [29:15] unknown field "resource"
+      26 |           explicit:
+      27 |             type: string
+      28 |           implicit:
+    > 29 |             - resource: SizeConverter
+                         ^
+      30 |               args:
+      31 |                 from: $_memory
+      32 |                 to: MiB
+      33 |               
+Aug 25 11:38:10.827[31m [ERRO] [0munable to parse linchpin.yaml as a provisioner:
+ [2:1] unknown field "Server"
+       1 | ---
+    >  2 | Server:
+           ^
+       3 |   create:
+       4 |     - match:
+       5 |         type: object
+       6 |         
+Aug 25 11:38:10.827[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 11:38:26.686[31m [FATA] [0mUnable to parse DSL file:
+duplicated struct field name resource
+Aug 25 11:38:41.464[31m [FATA] [0mUnable to parse DSL file:
+duplicated struct field name resource
+Aug 25 11:39:08.581[31m [ERRO] [0munable to parse provider.yaml as a provider:
+ [29:15] unknown field "resource"
+      26 |           explicit:
+      27 |             type: string
+      28 |           implicit:
+    > 29 |             - resource: SizeConverter
+                         ^
+      30 |               args:
+      31 |                 from: $_memory
+      32 |                 to: MiB
+      33 |               
+Aug 25 11:39:08.582[31m [ERRO] [0munable to parse linchpin.yaml as a provisioner:
+ [2:1] unknown field "Server"
+       1 | ---
+    >  2 | Server:
+           ^
+       3 |   create:
+       4 |     - match:
+       5 |         type: object
+       6 |         
+Aug 25 11:39:08.582[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 11:49:42.293[31m [ERRO] [0munable to parse linchpin.yaml as a provisioner:
+ [2:1] unknown field "Server"
+       1 | ---
+    >  2 | Server:
+           ^
+       3 |   create:
+       4 |     - match:
+       5 |         type: object
+       6 |         
+Aug 25 11:49:42.293[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 11:57:22.917[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 12:01:02.510[37m [DEBU] [0m[]
+Aug 25 12:01:02.516[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 12:02:10.141[37m [DEBU] [0mMatch results:
+[]
+Aug 25 12:02:10.141[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 13:26:56.806[37m [DEBU] [0mmatching resource:
+{Server  map[_memory:4g imageRef:Fedora-31 key_name:central-ci]}
+Aug 25 13:26:56.807[37m [DEBU] [0mMatch results:
+[]
+Aug 25 13:26:56.807[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 13:28:38.207[37m [DEBU] [0mmatching resource:
+{Name:Server Type: Args:map[_memory:4g imageRef:Fedora-31 key_name:central-ci]}
+Aug 25 13:28:38.208[37m [DEBU] [0mMatch results:
+[]
+Aug 25 13:28:38.208[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 13:33:46.854[37m [DEBU] [0mmatching resource:
+{
+    "resource": "Server",
+    "Type": "",
+    "args": {
+        "_memory": "4g",
+        "imageRef": "Fedora-31",
+        "key_name": "central-ci"
+    }
+}
+Aug 25 13:33:46.854[37m [DEBU] [0mMatch results:
+[]
+Aug 25 13:33:46.854[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 13:57:52.104[37m [DEBU] [0mMatch results:
++----------+--------+----------+
+| RESOURCE | SYSTEM | SOLUTION |
++----------+--------+----------+
++----------+--------+----------+
+Aug 25 13:57:52.104[37m [DEBU] [0mMatch results:
+[]
+Aug 25 13:57:52.104[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 13:59:04.884[37m [DEBU] [0mMatch results:
++----------------------------------+---------------------------------+----------+
+| RESOURCE                         | SYSTEM                          | SOLUTION |
++----------------------------------+---------------------------------+----------+
+|                                  {                                 |          |
+|     "resource": "Server",        |     "providerType": "Openstack" |          |
+|     "Type": "",                  | }                               |          |
+|     "args": {                    |                                            |
+|         "_memory": "4g",         |                                            |
+|         "imageRef": "Fedora-31", |                                            |
+|         "key_name": "central-ci" |                                            |
+|     }                            |                                            |
+| }                                |                                            |
++----------------------------------+---------------------------------+----------+
+Aug 25 13:59:04.884[37m [DEBU] [0mMatch results:
+[]
+Aug 25 13:59:04.884[31m [FATA] [0mEngine failed to run:
+no solution found for resource
+Aug 25 15:11:23.280[31m [FATA] [0mNew engine match process failed:
+properties must be of type object
+Aug 25 15:24:52.467[31m [FATA] [0mUnable to parse DSL file:
+[11:5] unknown field "resource"
+   8 | tools:
+   9 |   - tools.yaml
+  10 | resources:
+> 11 |   - resource: Server
+           ^
+  12 |     args:
+  13 |       _memory: 4g
+  14 |       imageRef: Fedora-31
+  15 |       

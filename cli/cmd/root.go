@@ -15,7 +15,7 @@ var (
 	cfgFile     string
 	logFile		os.File
 	rootCmd = &cobra.Command{
-		Use:   "borderline",
+		Use:   "openengine",
 		Short: "Borderline command line tool",
 		Long: `CLI for processing DSL Borderline engine `,
 	}
@@ -30,7 +30,7 @@ func Execute() error {
 func init() {
 	cobra.OnInitialize(initConfig, initLogger)
 
-	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "borderline.yaml", "config file")
+	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "openengine.yaml", "config file")
 	rootCmd.PersistentFlags().StringP("dsl", "b", "bdsl.yaml", "DSL file")
 	rootCmd.PersistentFlags().BoolP("debug", "d", false, "Debug log level")
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Print log to stdout")
@@ -46,8 +46,8 @@ func initConfig() {
 	viper.BindPFlag("dsl", rootCmd.PersistentFlags().Lookup("dsl"))
 	viper.BindPFlag("log.debug", rootCmd.PersistentFlags().Lookup("debug"))
 	viper.BindPFlag("log.verbose", rootCmd.PersistentFlags().Lookup("verbose"))
-	viper.SetDefault("log.file", "borderline.log")
-	viper.SetDefault("cache_path", ".borderline")
+	viper.SetDefault("log.file", "openengine.log")
+	viper.SetDefault("cache_path", ".openengine")
 }
 
 

@@ -5,21 +5,21 @@ SizeConverter:
       type: string
     to:
       type: string
-  logic: http://.../size_converter.yaml
+  script: size_converter.sh
 JsonFirst:
   parameters:
     data:
       type: string
-  logic: http://.../json_first.yaml
+  script: json_first.sh
 JsonPath:
   parameters:
     data:
       type: string
     path:
       type: string
-  logic: http://.../json_path.yaml
+  script: json_path.sh
 NameGenerator:
   parameters:
     random:
       type: boolean
-  logic: http://.../name_generator.yaml
+  script: name_generator.sh

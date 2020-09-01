@@ -1,9 +1,12 @@
 package common
 
 import (
+	"encoding/json"
 	"fmt"
-	"github.com/abraverm/engine/engine2"
+	"github.com/abraverm/openengine/engine"
 	"github.com/goccy/go-yaml"
+	"github.com/jedib0t/go-pretty/v6/table"
+	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -11,12 +14,12 @@ import (
 )
 
 type DSL struct {
-	API          []string  `yaml:"api"`
-	Provisioners []string `yaml:"provisioners"`
-	Systems    	 []engine2.System `yaml:"systems"`
-	Tools        []string `yaml:"tools"`
-	Resources    []engine2.Resource `yaml:"resources"`
-	Engine 		 engine2.Engine
+	API          []string          `yaml:"api"`
+	Provisioners []string          `yaml:"provisioners"`
+	Systems      []engine.System   `yaml:"systems"`
+	Tools        []string          `yaml:"tools"`
+	Resources    []engine.Resource `yaml:"resources"`
+	Engine       engine.Engine
 }
 
 func fileExists(filename string) bool {
@@ -55,8 +58,8 @@ func getSource(uri string) ([]byte, error) {
 	return data, nil
 }
 
-func (d *DSL) CreateEngine() error {
-	e := engine2.NewEngine()
+func (d *DSL) CreateEngine() {
+	e := engine.NewEngine()
 	for _, system := range d.Systems {
 		e.AddSystem(system)
 	}
@@ -66,40 +69,82 @@ func (d *DSL) CreateEngine() error {
 	for _, provider := range d.API {
 		data, err := getSource(provider)
 		if err != nil {
-			return err
+			log.Errorf("unable to load get source of %v:\n%v", provider, err)
 		}
-		var parsedData engine2.ProviderAPI
+		var parsedData engine.ProviderAPI
 		err = yaml.UnmarshalWithOptions(data, &parsedData, yaml.Strict())
 		if err != nil {
-			return err
+			log.Errorf("unable to parse %v as a provider:\n %v", provider, err)
 		}
 		e.AddProvider(parsedData)
 	}
 	for _, provisioner := range d.Provisioners {
 		data, err := getSource(provisioner)
 		if err != nil {
-			return err
+			log.Errorf("unable to load get source of %v:\n%v", provisioner, err)
 		}
-		var parsedData engine2.Provisioner
+		var parsedData engine.ProvisionerAPI
 		if err := yaml.UnmarshalWithOptions(data, &parsedData, yaml.Strict()); err != nil {
-			return err
+			log.Errorf("unable to parse %v as a provisioner:\n %v", provisioner, err)
 		}
-		e.AddProvisioner(parsedData)
+		for resourceName, resourceActions := range parsedData {
+			for actionName, actionProvisioners := range resourceActions {
+				for _, actionProvisioner := range actionProvisioners {
+					actionProvisioner.Resource = resourceName
+					actionProvisioner.Action = actionName
+					e.AddProvisioner(actionProvisioner)
+				}
+
+			}
+		}
+	}
+	for _, tool := range d.Tools {
+		data, err := getSource(tool)
+		if err != nil {
+			log.Errorf("unable to load get source of %v:\n%v", tool, err)
+		}
+		var parsedData engine.ToolAPI
+		err = yaml.UnmarshalWithOptions(data, &parsedData, yaml.Strict())
+		if err != nil {
+			log.Errorf("unable to parse %v as a tool:\n %v", tool, err)
+		}
+		e.AddTool(parsedData)
 	}
 	if err := e.Match(); err != nil {
-		return err
+		log.Fatalf("New engine match process failed:\n%v", err)
 	}
+	log.Debugf("Match results:\n%v", listSolutions(e.GetSolutions()))
 	e.Resolve()
+	log.Debugf("Resolved solutions:\n%v", listSolutions(e.GetSolutions()))
 	d.Engine = *e
-	return nil
+}
+
+func listSolutions(solutions []engine.Solution) string {
+	t := table.NewWriter()
+	t.AppendHeader(table.Row{"Solution", "Resource", "System", "Provider", "Provisioner", "Debug"})
+	autoMerge := table.RowConfig{AutoMerge: true}
+	for _, solution := range solutions {
+		t.AppendRow(table.Row{solution.ToJson(), toJson(solution.Resource), toJson(solution.System), toJson(solution.Provider), toJson(solution.Provisioner), solution.Output}, autoMerge)
+		t.AppendSeparator()
+	}
+	return t.Render()
+}
+
+func toJson(object interface{}) string {
+	oJSON, _ := json.MarshalIndent(object, "", "  ")
+	return string(oJSON)
 }
 
 func (d DSL) Run(action string) error {
 	if err := d.Engine.Schedule(action); err != nil {
 		return err
 	}
-	if _, err := d.Engine.Run(); err != nil {
+	results, err := d.Engine.Run()
+	if err != nil {
 		return err
+	}
+	for _, result := range results {
+		log.Debugln("\n", result)
 	}
 	return nil
 }

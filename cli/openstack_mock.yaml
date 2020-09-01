@@ -1,0 +1,17 @@
+---
+Flavor:
+  get:
+    - match:
+        type: object
+        properties:
+          providerType:
+            type: string
+      parameters:
+        minDisk:
+          type: string # TODO
+        minRam:
+          type: string # TODO
+        is_public:
+          type: boolean
+      logic: openstack_mock_flavor.tmpl
+      debug: false

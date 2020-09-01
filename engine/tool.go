@@ -1,12 +1,14 @@
-package engine2
+package engine
 
 import (
-	"github.com/xeipuuv/gojsonschema"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"strings"
 	"text/template"
 )
+type ToolAPI map[string]Tool
 
 type Tool struct {
 	Name string
@@ -14,23 +16,10 @@ type Tool struct {
 	Script string
 }
 
-func (t Tool) match(task ImplicitTask) bool {
-	data := gojsonschema.NewGoLoader(task)
-	loader := gojsonschema.NewGoLoader(t.toJsonSchema())
-	result, err := gojsonschema.Validate(loader, data)
-	if err != nil {
-		return false
-	}
-	if result.Valid() {
-		return true
-	}
-	return false
-}
-
 func (t Tool) Run(args map[string]interface{}) (string, error) {
 	file, err := ioutil.TempFile("", "script.*.sh")
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("tool Run failed: %v", err)
 	}
 	defer func() {
 		removeError := os.Remove(file.Name())
@@ -40,23 +29,23 @@ func (t Tool) Run(args map[string]interface{}) (string, error) {
 	}()
 	tmpl, err := template.ParseFiles(t.Script)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("tool Run failed: %v", err)
 	}
 	if err := tmpl.Execute(file, args); err != nil {
-		return "", err
+		return "", fmt.Errorf("tool Run failed: %v", err)
 	}
 	out, err := exec.Command("/bin/sh", file.Name()).Output()
 	if err != nil {
-		return string(out), err
+		return string(out), fmt.Errorf("tool Run failed: %v", err)
 	}
-	return string(out), nil
+	return strings.TrimSpace(string(out)), nil
 }
 
-func (t Tool) toJsonSchema() JSONSchema {
-	return JSONSchema{
+func (t Tool) toJsonSchema() Schema {
+	return Schema{
 		"type": "object",
-		"properties": JSONSchema{
-			"resource": JSONSchema{
+		"properties": Schema{
+			"Resource": Schema{
 				"type": "string",
 				"const": t.Name,
 			},

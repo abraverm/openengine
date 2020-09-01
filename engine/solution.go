@@ -1,7 +1,9 @@
-package engine2
+package engine
 
 import (
+	"encoding/json"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -10,15 +12,17 @@ import (
 )
 
 type Solution struct {
-	resource Resource
-	system System
-	provider Provider
-	provisioner Provisioner
-	resolved bool
+	Resource       Resource
+	System         System
+	Provider       Provider
+	Provisioner    Provisioner
+	resolved       bool
 	resolutionTree map[string]Param
-	parent *Solution
-	size int
-	action string
+	parent         *Solution
+	size           int
+	action         string
+	Output         string
+	debug          bool
 }
 
 type Task struct {
@@ -50,10 +54,10 @@ func (s solutionList) Swap(i, j int) {
 }
 
 func (s Solution) equals(solution Solution) bool {
-	provisionerMatch := reflect.DeepEqual(s.provisioner, solution.provisioner)
-	providerMatch := reflect.DeepEqual(s.provider, solution.provider)
-	resourceMatch := reflect.DeepEqual(s.resource, solution.resource)
-	systemMatch := reflect.DeepEqual(s.system, solution.system)
+	provisionerMatch := reflect.DeepEqual(s.Provisioner, solution.Provisioner)
+	providerMatch := reflect.DeepEqual(s.Provider, solution.Provider)
+	resourceMatch := reflect.DeepEqual(s.Resource, solution.Resource)
+	systemMatch := reflect.DeepEqual(s.System, solution.System)
 	if provisionerMatch && providerMatch && resourceMatch && systemMatch {
 		return true
 	} else {
@@ -80,20 +84,34 @@ func (s Solution) exists(solutions []Solution) bool {
 	return false
 }
 
+func intersect(a []string, b []string) []string {
+	set := make([]string, 0)
+	for i := 0; i < len(a); i++ {
+		for j := 0; j < len(b); j ++ {
+			if 	a[i] == b[j] {
+				set = append(set, a[i])
+			}
+		}
+	}
+	return set
+}
+
+
 func (s *Solution) resolveExplicit() []string {
 	var implicit []string
-	for param := range s.provider.Parameters {
-		if _, ok := s.resource.Args[param]; !ok {
-			// parameter is not used
-			continue
-		}
-		if fmt.Sprintf("%T", s.resource.Args[param]) != "map[string]interface{}" {
+	resourceImplicit := s.Resource.getImplicitKeys()
+	providerImplicit := s.Provider.getImplicitKeys()
+	for param := range s.Provider.Parameters {
+		if _, ok := s.Resource.Args[param]; ok { // Explicit
 			s.resolutionTree[param] = Param{
 				paramType: "explicit",
 				resolved: true,
 				tasks:    nil,
 			}
-		} else {
+			continue
+		}
+		paramImplicit := intersect(s.Provider.Parameters[param].getImplicitKeys(), providerImplicit)
+		if len(intersect(paramImplicit, resourceImplicit)) == len(paramImplicit) { // Supported Implicit
 			implicit = append(implicit, param)
 		}
 	}
@@ -102,22 +120,31 @@ func (s *Solution) resolveExplicit() []string {
 
 func (s Solution) Run(solutionArgs map[string]interface{}) (string, error) {
 	var args = make(map[string]interface{})
+	if s.Resource.Args == nil {
+		s.Resource.Args = args
+	}
 	for k, v := range solutionArgs {
-		s.resource.Args[k] = v
+		s.Resource.Args[k] = v
 	}
 	for key, def := range s.resolutionTree {
 		if def.paramType == "explicit" {
-			args[key] = s.resource.Args[key]
+			args[key] = s.Resource.Args[key]
 		} else {
 			var taskResults = make (map[string]interface{})
-			taskResults[key] = s.resource.Args[key]
+			taskResults[key] = s.Resource.Args[key] // ?
 			for i, task := range def.tasks {
-				implicitTask := s.provider.Parameters[key].Implicit[i]
+				implicitTask := s.Provider.Parameters[key].Implicit[i]
 				if task.taskType == "tool" {
-					result, _ := task.tool.Run(implicitTask.resolve(taskResults))
+					result, err := task.tool.Run(implicitTask.resolve(taskResults))
+					if err != nil {
+						return "", err
+					}
 					taskResults[implicitTask.Store] = result
 				} else {
-					result, _ := task.solution.Run(taskResults)
+					result, err := task.solution.Run(taskResults)
+					if err != nil {
+						return "", err
+					}
 					taskResults[implicitTask.Store] = result
 				}
 			}
@@ -126,24 +153,25 @@ func (s Solution) Run(solutionArgs map[string]interface{}) (string, error) {
 	}
 	file, err := ioutil.TempFile("", "script.*.sh")
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("solution run failed creating temp file: %v", err)
 	}
 	defer func() {
 		removeError := os.Remove(file.Name())
 		if err == nil {
-			err = removeError
+			err = fmt.Errorf("solution run failed to remove temp file: %v", removeError)
 		}
 	}()
-	tmpl, err := template.ParseFiles(s.provisioner.Logic)
+	tmpl, err := template.ParseFiles(s.Provisioner.Logic)
 	if err != nil {
-		return "", err
+		sJson, _ := json.MarshalIndent(s, "", "    ")
+		return "", fmt.Errorf("solution run failed to parse provisioner logic: %v\n%v", err, string(sJson))
 	}
 	if err := tmpl.Execute(file, args); err != nil {
-		return "", err
+		return "", fmt.Errorf("solution run failed to execut script: %v", err)
 	}
 	out, err := exec.Command("/bin/sh", file.Name()).Output()
 	if err != nil {
-		return string(out), err
+		return string(out), fmt.Errorf("solution run script failed: %v", err)
 	}
 	return string(out), nil
 }
@@ -157,8 +185,12 @@ func makeRange(min, max int) []int {
 }
 
 // function to build the combinations
+// https://groups.google.com/g/golang-nuts/c/UcJ5h0P2jc0
 func combIntSlices(seq [][]int) (out [][]int) {
 	if len(seq) == 0 {
+		return nil
+	}
+	if len(seq) == 1 {
 		return nil
 	}
 	// fill combSeq with the first slice of seq
@@ -169,7 +201,7 @@ func combIntSlices(seq [][]int) (out [][]int) {
 
 	seq = seq[1:] // seq is the [][]slice to combine with combSeq [[4 5] [6 7 8]]
 
-	// rec recursive funtion
+	// rec recursive function
 	var rec func(int, [][]int, [][]int)
 	rec = func(i int, seq, combSeq [][]int) {
 
@@ -198,7 +230,7 @@ func combIntSlices(seq [][]int) (out [][]int) {
 
 func (s Solution) decouple() []Solution {
 	var decoupled []Solution
-	var placeholder map[string]map[int][]Solution
+	var placeholder = make(map[string]map[int][]Solution)
 	var paramMap []string
 	var params [][]int
 	var paramTasks [][][]int
@@ -208,7 +240,8 @@ func (s Solution) decouple() []Solution {
 		var tasksMap []int
 		var tasks [][]int
 		for b, task := range param.tasks {   // recursion stop condition
-			if task.taskType == "solution" { // recursion stop condition
+			if task.taskType == "Resource" { // recursion stop condition
+				placeholder[a] = map[int][]Solution{}
 				for _, alt := range task.alternatives {
 					for _, decoupledAlt := range alt.decouple(){
 						tmp := s
@@ -222,10 +255,10 @@ func (s Solution) decouple() []Solution {
 				tasksMap = append(tasksMap, b)
 			}
 		}
-		// implicit param X has N > 1 resource type tasks
-		// the resource type task requires a solution by itself, and might be implicit itself
-		// thus is each resource task might have alternative solutions and they are too need to be decoupled
-		// combTasks is the all possible combinations of decoupled alternatives of resource tasks
+		// implicit param X has N > 1 Resource type tasks
+		// the Resource type task requires a solution by itself, and might be implicit itself
+		// thus is each Resource task might have alternative solutions and they are too need to be decoupled
+		// combTasks is the all possible combinations of decoupled alternatives of Resource tasks
 		// tasksMap restores the original position of combTask set
 		// for example task t1,t5 in param X have alternatives {a, b} and {c, d}
 		// combTasks : [{a, c}, {a, d}, {b, c}, {b, d}] , tasksMap: [t1, t5]
@@ -246,16 +279,59 @@ func (s Solution) decouple() []Solution {
 			for _, taskComb := range combTasks {
 				for taskMapId, taskAlt := range taskComb{ // 1, a
 					taskPos := paramTasksMap[paramId][taskMapId]  // t1
-					s.resolutionTree[paramName].tasks[taskPos].solution = placeholder[paramName][taskPos][taskAlt]
+					decoupledSolution.resolutionTree[paramName].tasks[taskPos].solution = placeholder[paramName][taskPos][taskAlt]
 				}
 			}
 		}
 		decoupled = append(decoupled, decoupledSolution)
 	}
-	// If there is implicit resource tasks, then there is nothing to decouple and the original
+	// If there is implicit Resource tasks, then there is nothing to decouple and the original
 	// solution should be returned - recursion end logic
 	if len(decoupled) == 0 {
 		decoupled = append(decoupled, s)
 	}
 	return decoupled
+}
+
+func (s Solution)  MarshalJSON() ([]byte, error) {
+	j, err := json.Marshal(struct {
+	Debug       bool
+	Resolved    bool
+	Size        int
+	Tree        map[string]Param
+	Action      string
+	Provider    Provider
+	Provisioner Provisioner
+	Resource    Resource
+	System      System
+}{
+		Debug: s.debug,
+		Resolved: s.resolved,
+		Size: s.size,
+		Tree: s.resolutionTree,
+		Action: s.action,
+		Provider: s.Provider,
+		Provisioner: s.Provisioner,
+		Resource: s.Resource,
+		System: s.System,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return j, nil
+}
+
+func (s Solution) ToJson() string {
+	data := map[string]interface{}{
+		"debug": s.debug,
+		"resolved": s.resolved,
+		"size": s.size,
+		"tree": s.resolutionTree,
+		"action": s.action,
+	}
+	sJSON, err := json.MarshalIndent(data, "", "    ")
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+	return string(sJSON)
 }

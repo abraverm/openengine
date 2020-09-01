@@ -12,4 +12,7 @@ simple:
             image: {{ .imageRef }}
             keypair: {{ .key_name }}
 EOF
-linchpin up --env-vars linchpin_mock True
+# linchpin up --env-vars linchpin_mock True
+cat PinFile
+rm -rf PinFile
+echo "Server {{ .name }} was created"

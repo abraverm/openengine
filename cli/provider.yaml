@@ -27,37 +27,66 @@ Server:
             type: string
           implicit:
             - resource: SizeConverter
+              type: tool
               args:
                 from: $_memory
                 to: MiB
               store: $_memory
             - resource: SizeConverter
+              type: tool
               args:
                 from: $_disk
                 to: GiB
               store: $_disk
             - resource: Flavor
+              type: resource
               action: get
               args:
                 minDisk: $_disk
                 minRam: $_memory
               store: $_flavors
             - resource: JsonFirst
+              type: tool
               args:
                 data: $_flavors
               store: $_flavor
             - resource: JsonPath
+              type: tool
               args:
                 data: $_flavors
                 path: .name
-              store: $flavorRef
+              store: flavorRef
         name:
           required: true
           explicit:
             type: string
           implicit:
             - resource: NameGenerator
+              type: tool
               action: create
               args:
                 random: true
-              store: $name
+              store: name
+      debug: false
+Flavor:
+  providers:
+    - action: get
+      match:
+        type: object
+        properties:
+          providerType:
+            type: string
+      parameters:
+        minDisk:
+          required: false
+          explicit:
+            type: string # TODO
+        minRam:
+          required: false
+          explicit:
+            type: string # TODO
+        is_public:
+          required: false
+          explicit:
+            type: boolean
+      debug: false

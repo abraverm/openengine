@@ -3,6 +3,7 @@ api:
   - provider.yaml
 provisioners:
   - linchpin.yaml
+  - openstack_mock.yaml
 systems:
   - providerType: Openstack
 tools:
@@ -11,5 +12,6 @@ resources:
   - resource: Server
     args:
       _memory: 4g
+      _cpu: 2g
       imageRef: Fedora-31
-      key_name: central-ci
+      key_name: ccit

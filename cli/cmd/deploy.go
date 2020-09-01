@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/abraverm/engine/cli/common"
+	"github.com/abraverm/openengine/cli/common"
 	yaml "github.com/goccy/go-yaml"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -26,18 +26,16 @@ func deploy(cmd *cobra.Command, args []string) {
 	filename, _ := filepath.Abs(viper.GetString("dsl"))
 	yamlFile, err := ioutil.ReadFile(filename)
 	if err != nil {
-		log.Fatal("Unable to read DSL file:", err)
+		log.Fatalf("Unable to read DSL file:\n%v", err)
 	}
 
 	var dsl common.DSL
 	err = yaml.UnmarshalWithOptions(yamlFile, &dsl, yaml.Strict())
 	if err != nil {
-		log.Fatalf("Unable to parse DSL file: %v", fmt.Sprintf(err.Error()))
+		log.Fatalf("Unable to parse DSL file:\n%v", fmt.Sprintf(err.Error()))
 	}
-	if err = dsl.CreateEngine(); err != nil {
-		log.Fatal(err)
-	}
+	dsl.CreateEngine()
 	if err := dsl.Run("create"); err != nil {
-		log.Fatal(err)
+		log.Fatalf("Engine failed to run:\n%v", err)
 	}
 }
