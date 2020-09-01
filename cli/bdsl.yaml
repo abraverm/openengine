@@ -15,3 +15,14 @@ resources:
       _cpu: 2g
       imageRef: Fedora-31
       key_name: ccit
+  - resource: Server
+    args:
+      imageRef: Fedora-31
+      key_name: ccit
+      name: FullyExplicit
+      flavorRef: m2.large
+  - resource: Server
+    args:
+      imageRef: Fedora-31
+      key_name: ccit
+      flavorRef: m2.large
