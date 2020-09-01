@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/abraverm/openengine/cli/cmd"
+	"github.com/abraverm/openengine/cli/oe/cmd"
 )
 
 func main() {

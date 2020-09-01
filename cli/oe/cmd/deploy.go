@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/abraverm/openengine/cli/common"
+	"github.com/abraverm/openengine/cli/oe/common"
 	yaml "github.com/goccy/go-yaml"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
