@@ -3,7 +3,7 @@ Server:
   implicit:
     _memory:
       type: string
-    _cpu:
+    _disk:
       type: string
   providers:
     - action: create
@@ -21,6 +21,41 @@ Server:
           required: false
           explicit:
             type: string
+        networks:
+          required: true
+          explicit:
+            type: string
+          implicit:
+              # https://docs.openstack.org/api-ref/network/v2/?expanded=list-networks-detail,list-floating-ips-detail,list-floating-ip-pools-detail,list-subnets-detail,show-network-ip-availability-detail#show-network-ip-availability
+            - resource: NetworkIPAvailability
+              type: resource
+              action: get
+              args: {}
+              store: $_networks
+            - resource: JsonTransform
+              type: tool
+              args:
+                data: $_networks
+                template: '{ network_id: ."Network ID", network_name: ."Network Name", available_ips: (."Total IPs" - ."Used IPs")}'
+              store: $_transformed
+            - resource: JsonSort
+              type: tool
+              args:
+                data: $_transformed
+                sortBy: .available_ips
+                sortType: dec
+              store: $_sorted
+            - resource: JsonFirst
+              type: tool
+              args:
+                data: $_sorted
+              store: $_network
+            - resource: JsonPath
+              type: tool
+              args:
+                data: $_network
+                path: .network_name
+              store: networks
         flavorRef:
           required: true
           explicit:
@@ -53,7 +88,7 @@ Server:
             - resource: JsonPath
               type: tool
               args:
-                data: $_flavors
+                data: $_flavor
                 path: .name
               store: flavorRef
         name:
@@ -89,4 +124,18 @@ Flavor:
           required: false
           explicit:
             type: boolean
+      debug: false
+NetworkIPAvailability:
+  providers:
+    - action: get
+      match:
+        type: object
+        properties:
+          providerType:
+            type: string
+      parameters:
+        network_id:
+          required: false
+          explicit:
+            type: string
       debug: false

@@ -113,9 +113,9 @@ func (d *DSL) CreateEngine() {
 	if err := e.Match(); err != nil {
 		log.Fatalf("New engine match process failed:\n%v", err)
 	}
-	log.Debugf("Match results:\n%v", listSolutions(e.GetSolutions()))
+	//log.Debugf("Match results:\n%v", listSolutions(e.GetSolutions()))
 	e.Resolve()
-	log.Debugf("Resolved solutions:\n%v", listSolutions(e.GetSolutions()))
+	//log.Debugf("Resolved solutions:\n%v", listSolutions(e.GetSolutions()))
 	d.Engine = *e
 }
 

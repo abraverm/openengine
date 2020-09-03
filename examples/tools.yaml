@@ -18,6 +18,23 @@ JsonPath:
     path:
       type: string
   script: json_path.sh
+JsonTransform:
+  parameters:
+    data:
+      type: string
+    template:
+      type: string
+  script: json_transform.sh
+JsonSort:
+  parameters:
+    data:
+      type: string
+    sortBy:
+      type: string
+    sortType:
+      type: string
+      enum: ["asc", "dec"]
+  script: json_sort.sh
 NameGenerator:
   parameters:
     random:

@@ -36,7 +36,7 @@ func (t Tool) Run(args map[string]interface{}) (string, error) {
 	}
 	out, err := exec.Command("/bin/sh", file.Name()).Output()
 	if err != nil {
-		return string(out), fmt.Errorf("tool Run failed: %v", err)
+		return string(out), fmt.Errorf("tool Run failed: %v\n%v", err, string(out))
 	}
 	return strings.TrimSpace(string(out)), nil
 }

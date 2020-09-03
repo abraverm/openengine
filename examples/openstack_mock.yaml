@@ -15,3 +15,15 @@ Flavor:
           type: boolean
       logic: openstack_mock_flavor.tmpl
       debug: false
+NetworkIPAvailability:
+  get:
+    - match:
+        type: object
+        properties:
+          providerType:
+            type: string
+      parameters:
+        network_id:
+          type: string # TODO
+      logic: openstack_mock_networkipavailability.tmpl
+      debug: false

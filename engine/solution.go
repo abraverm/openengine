@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"reflect"
+	"regexp"
 	"text/template"
 )
 
@@ -120,6 +121,7 @@ func (s *Solution) resolveExplicit() []string {
 
 func (s Solution) Run(solutionArgs map[string]interface{}) (string, error) {
 	var args = make(map[string]interface{})
+	re := regexp.MustCompile(`\$_[[:alpha:]]*`)
 	if s.Resource.Args == nil {
 		s.Resource.Args = args
 	}
@@ -131,22 +133,30 @@ func (s Solution) Run(solutionArgs map[string]interface{}) (string, error) {
 			args[key] = s.Resource.Args[key]
 		} else {
 			var taskResults = make (map[string]interface{})
-			taskResults[key] = s.Resource.Args[key] // ?
+			taskResults = s.Resource.Args // ?
 			for i, task := range def.tasks {
+				var store string
 				implicitTask := s.Provider.Parameters[key].Implicit[i]
+				if re.MatchString(implicitTask.Store) {
+					store = implicitTask.Store[1:]
+				} else {
+					store = implicitTask.Store
+				}
 				if task.taskType == "tool" {
-					result, err := task.tool.Run(implicitTask.resolve(taskResults))
+					taskArgs := implicitTask.resolve(taskResults)
+					result, err := task.tool.Run(taskArgs)
 					if err != nil {
 						return "", err
 					}
-					taskResults[implicitTask.Store] = result
+					taskResults[store] = result
 				} else {
 					result, err := task.solution.Run(taskResults)
 					if err != nil {
 						return "", err
 					}
-					taskResults[implicitTask.Store] = result
+					taskResults[store] = result
 				}
+
 			}
 			args[key] = taskResults[key]
 		}

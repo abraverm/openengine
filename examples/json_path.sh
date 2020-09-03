@@ -1,2 +1,2 @@
-echo "m1.tiny"
+echo '{{ .data }}' | jq -r '{{ .path }}'
 exit 0
