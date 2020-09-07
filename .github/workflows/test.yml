@@ -22,7 +22,7 @@ jobs:
       run: go test -race -covermode=atomic -coverprofile=coverage.txt -coverpkg=./... ./...
     - uses: codecov/codecov-action@v1
       with:
-        file: ./coverage.xml
+        file: ./coverage.txt
         fail_ci_if_error: true
 
   imports:
