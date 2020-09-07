@@ -1,11 +1,9 @@
 package common
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/abraverm/openengine/engine"
 	"github.com/goccy/go-yaml"
-	"github.com/jedib0t/go-pretty/v6/table"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
@@ -113,26 +111,8 @@ func (d *DSL) CreateEngine() {
 	if err := e.Match(); err != nil {
 		log.Fatalf("New engine match process failed:\n%v", err)
 	}
-	//log.Debugf("Match results:\n%v", listSolutions(e.GetSolutions()))
 	e.Resolve()
-	//log.Debugf("Resolved solutions:\n%v", listSolutions(e.GetSolutions()))
 	d.Engine = *e
-}
-
-func listSolutions(solutions []engine.Solution) string {
-	t := table.NewWriter()
-	t.AppendHeader(table.Row{"Solution", "Resource", "System", "Provider", "Provisioner", "Debug"})
-	autoMerge := table.RowConfig{AutoMerge: true}
-	for _, solution := range solutions {
-		t.AppendRow(table.Row{solution.ToJson(), toJson(solution.Resource), toJson(solution.System), toJson(solution.Provider), toJson(solution.Provisioner), solution.Output}, autoMerge)
-		t.AppendSeparator()
-	}
-	return t.Render()
-}
-
-func toJson(object interface{}) string {
-	oJSON, _ := json.MarshalIndent(object, "", "  ")
-	return string(oJSON)
 }
 
 func (d DSL) Run(action string) error {

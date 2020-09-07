@@ -40,16 +40,3 @@ func (t Tool) Run(args map[string]interface{}) (string, error) {
 	}
 	return strings.TrimSpace(string(out)), nil
 }
-
-func (t Tool) toJsonSchema() Schema {
-	return Schema{
-		"type": "object",
-		"properties": Schema{
-			"Resource": Schema{
-				"type": "string",
-				"const": t.Name,
-			},
-			"parameters": t.Parameters,
-		},
-	}
-}

@@ -76,15 +76,6 @@ func (s Solution) inLoop(solution Solution) bool {
 	return s.parent.inLoop(solution)
 }
 
-func (s Solution) exists(solutions []Solution) bool {
-	for _, solution := range solutions {
-		if s.equals(solution) {
-			return true
-		}
-	}
-	return false
-}
-
 func intersect(a []string, b []string) []string {
 	set := make([]string, 0)
 	for i := 0; i < len(a); i++ {
@@ -132,8 +123,7 @@ func (s Solution) Run(solutionArgs map[string]interface{}) (string, error) {
 		if def.paramType == "explicit" {
 			args[key] = s.Resource.Args[key]
 		} else {
-			var taskResults = make (map[string]interface{})
-			taskResults = s.Resource.Args // ?
+			taskResults := s.Resource.Args
 			for i, task := range def.tasks {
 				var store string
 				implicitTask := s.Provider.Parameters[key].Implicit[i]

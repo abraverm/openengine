@@ -28,9 +28,7 @@ func (r Resource) getImplicitKeys() []string {
 		if re.MatchString(key) {
 			keys = append(keys, key)
 		}
-		for _, result := range re.FindAllString(fmt.Sprint(value), -1) {
-			keys = append(keys, result)
-		}
+		keys = append(keys, re.FindAllString(fmt.Sprint(value), -1)...)
 	}
 	return keys
 }

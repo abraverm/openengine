@@ -43,9 +43,9 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}
-	viper.BindPFlag("dsl", rootCmd.PersistentFlags().Lookup("dsl"))
-	viper.BindPFlag("log.debug", rootCmd.PersistentFlags().Lookup("debug"))
-	viper.BindPFlag("log.verbose", rootCmd.PersistentFlags().Lookup("verbose"))
+	_ = viper.BindPFlag("dsl", rootCmd.PersistentFlags().Lookup("dsl"))
+	_ = viper.BindPFlag("log.debug", rootCmd.PersistentFlags().Lookup("debug"))
+	_ = viper.BindPFlag("log.verbose", rootCmd.PersistentFlags().Lookup("verbose"))
 	viper.SetDefault("log.file", "openengine.log")
 	viper.SetDefault("cache_path", ".openengine")
 }

@@ -16,7 +16,6 @@ type Engine struct {
 	provisioners []Provisioner
 	solutions    []Solution
 	tools        []Tool
-	resolved     bool
 	schedule     []Schedule
 }
 
@@ -109,7 +108,7 @@ func (e Engine) matchProvidersProvisioners(resource Resource, system System) ([]
 			errors := fmt.Sprintf("Data:\n%v\nSchema:\n%v\n", string(dJSON), string(sJSON))
 			loader := new(jsonschema.Schema)
 			if err := json.Unmarshal(sJSON, loader); err != nil {
-				return nil, fmt.Errorf("unmarshal schema: %v\n", err.Error(), string(sJSON))
+				return nil, fmt.Errorf("unmarshal schema: %v\n%v", err.Error(), string(sJSON))
 			}
 			errs, err := loader.ValidateBytes(ctx, dJSON)
 			if err != nil {

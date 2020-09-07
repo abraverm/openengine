@@ -60,9 +60,7 @@ func (k ImplicitTask) getImplicitKeys() []string {
 	re := regexp.MustCompile(`\$_[[:alpha:]]*`)
 	var keys []string
 	for _, value := range k.Args{
-		for _, result := range re.FindAllString(fmt.Sprint(value), -1) {
-			keys = append(keys, result)
-		}
+		keys = append(keys, re.FindAllString(fmt.Sprint(value), -1)...)
 	}
 	return keys
 }
@@ -85,7 +83,7 @@ func (p Provider) toJsonSchema() Schema {
 			 required = append(required, param)
 		}
 	}*/
-	for param, _ := range p.Parameters {
+	for param := range p.Parameters {
 		argsSchema[param] = Schema{"$ref": fmt.Sprintf("%v",param)}
 	}
 	properties["Resource"] = Schema{

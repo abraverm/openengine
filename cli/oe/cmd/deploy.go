@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/abraverm/openengine/cli/oe/common"
 	yaml "github.com/goccy/go-yaml"
 	log "github.com/sirupsen/logrus"
@@ -32,7 +31,7 @@ func deploy(cmd *cobra.Command, args []string) {
 	var dsl common.DSL
 	err = yaml.UnmarshalWithOptions(yamlFile, &dsl, yaml.Strict())
 	if err != nil {
-		log.Fatalf("Unable to parse DSL file:\n%v", fmt.Sprintf(err.Error()))
+		log.Fatalf("Unable to parse DSL file:\n%v", err.Error())
 	}
 	dsl.CreateEngine()
 	if err := dsl.Run("create"); err != nil {
