@@ -16,4 +16,4 @@ jobs:
         uses: golangci/golangci-lint-action@v1
         with:
           version: v1.30
-          args: --tests=0
+          args: --tests=0 --enable-all --exclude-use-default=false
