@@ -123,7 +123,7 @@ func TestProviderAPIResourcesParam_toJsonSchema(t *testing.T) {
 				Explicit: tt.fields.Explicit,
 				Implicit: tt.fields.Implicit,
 			}
-			if got := p.toJsonSchema(tt.args.resourceImplicit, tt.args.name); !reflect.DeepEqual(got, tt.want) {
+			if got := p.toJSONSchema(tt.args.resourceImplicit, tt.args.name); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("toJSONSchema() = %v, want %v", got, tt.want)
 			}
 		})
