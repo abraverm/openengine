@@ -2,9 +2,10 @@ package engine
 
 import (
 	"context"
+	"regexp"
+
 	jptr "github.com/qri-io/jsonpointer"
 	"github.com/qri-io/jsonschema"
-	"regexp"
 )
 
 type oeRequired bool
@@ -21,17 +22,21 @@ func (f *oeRequired) Resolve(pointer jptr.Pointer, uri string) *jsonschema.Schem
 
 func (f *oeRequired) ValidateKeyword(ctx context.Context, currentState *jsonschema.ValidationState, data interface{}) {
 }
+
 type OeProperties map[string]*jsonschema.Schema
 
-func NewOeProperties () jsonschema.Keyword {
+func NewOeProperties() jsonschema.Keyword {
 	return new(OeProperties)
 }
 
+// nolint: nestif
+// TODO: function too comlicated (nested if).
 func (o OeProperties) ValidateKeyword(ctx context.Context, currentState *jsonschema.ValidationState, data interface{}) {
 	if obj, ok := data.(map[string]interface{}); ok {
 		subState := currentState.NewSubState()
 		re := regexp.MustCompile(`^_[[:alpha:]]*`)
-		var implicitParams = make(map[string]interface{})
+		implicitParams := make(map[string]interface{})
+
 		for key := range obj {
 			if re.MatchString(key) {
 				if _, ok := obj[key]; ok {
@@ -39,10 +44,12 @@ func (o OeProperties) ValidateKeyword(ctx context.Context, currentState *jsonsch
 				}
 			}
 		}
+
 		for key := range o {
 			if re.MatchString(key) {
 				continue
 			}
+
 			currentState.SetEvaluatedKey(key)
 			subState.ClearState()
 			subState.DescendBaseFromState(currentState, "oeProperties", key)
@@ -54,9 +61,11 @@ func (o OeProperties) ValidateKeyword(ctx context.Context, currentState *jsonsch
 			} else if len(implicitParams) > 0 { // Implicit case
 				o[key].ValidateKeyword(ctx, subState, implicitParams)
 			}
+
 			if o[key].HasKeyword("oeRequired") {
 				currentState.AddSubErrors(*subState.Errs...)
 			}
+
 			if subState.IsValid() {
 				currentState.UpdateEvaluatedPropsAndItems(subState)
 			}
@@ -74,6 +83,7 @@ func (o *OeProperties) Resolve(pointer jptr.Pointer, uri string) *jsonschema.Sch
 	if pointer == nil {
 		return nil
 	}
+
 	current := pointer.Head()
 	if current == nil {
 		return nil
@@ -82,20 +92,21 @@ func (o *OeProperties) Resolve(pointer jptr.Pointer, uri string) *jsonschema.Sch
 	if schema, ok := (*o)[*current]; ok {
 		return schema.Resolve(pointer.Tail(), uri)
 	}
+
 	return nil
 }
 
-// JSONProp implements the JSONPather for Properties
+// JSONProp implements the JSONPather for Properties.
 func (o OeProperties) JSONProp(name string) interface{} {
 	return o[name]
 }
 
-// JSONChildren implements the JSONContainer interface for Properties
+// JSONChildren implements the JSONContainer interface for Properties.
 func (o OeProperties) JSONChildren() (res map[string]jsonschema.JSONPather) {
 	res = map[string]jsonschema.JSONPather{}
 	for key, sch := range o {
 		res[key] = sch
 	}
+
 	return
 }
-

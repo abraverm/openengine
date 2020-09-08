@@ -1,15 +1,19 @@
 package cmd
 
 import (
-"fmt"
+	"fmt"
 
-"github.com/spf13/cobra"
+	"github.com/spf13/cobra"
 )
 
+// nolint: gochecknoinits
+// TODO: Replace cobra and viper with mow.cli .
 func init() {
 	rootCmd.AddCommand(versionCmd)
 }
 
+// nolint: gochecknoglobals
+// TODO: Replace cobra and viper with mow.cli .
 var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Print the version number of Borderline",

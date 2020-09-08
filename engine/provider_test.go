@@ -124,7 +124,7 @@ func TestProviderAPIResourcesParam_toJsonSchema(t *testing.T) {
 				Implicit: tt.fields.Implicit,
 			}
 			if got := p.toJsonSchema(tt.args.resourceImplicit, tt.args.name); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("toJsonSchema() = %v, want %v", got, tt.want)
+				t.Errorf("toJSONSchema() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -189,8 +189,8 @@ func TestProvider_toJsonSchema(t *testing.T) {
 				Parameters: tt.fields.Parameters,
 				Debug:      tt.fields.Debug,
 			}
-			if got := p.toJsonSchema(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("toJsonSchema() = %v, want %v", got, tt.want)
+			if got := p.toJSONSchema(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("toJSONSchema() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -222,8 +222,8 @@ func TestProvider_toJsonSchemaDefs(t *testing.T) {
 				Parameters: tt.fields.Parameters,
 				Debug:      tt.fields.Debug,
 			}
-			if got := p.toJsonSchemaDefs(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("toJsonSchemaDefs() = %v, want %v", got, tt.want)
+			if got := p.toJSONSchemaDefs(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("toJSONSchemaDefs() = %v, want %v", got, tt.want)
 			}
 		})
 	}

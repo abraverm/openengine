@@ -1,9 +1,13 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/abraverm/openengine/cli/oe/cmd"
 )
 
 func main() {
-	_ = cmd.Execute()
+	if err := cmd.Execute(); err != nil {
+		fmt.Printf("%v", err)
+	}
 }

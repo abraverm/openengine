@@ -14,9 +14,10 @@ type Provisioner struct {
 	Required   []string
 }
 
-func (p Provisioner) toJsonSchema() Schema {
+func (p Provisioner) toJSONSchema() Schema {
 	properties := make(map[string]interface{})
 	parameters := make(map[string]interface{})
+
 	for param, def := range p.Parameters {
 		parameters[param] = Schema{
 			"oneOf": []Schema{
@@ -25,6 +26,7 @@ func (p Provisioner) toJsonSchema() Schema {
 			},
 		}
 	}
+
 	args := Schema{
 		"oeProperties": parameters,
 		//"oeRequired": p.Required,
@@ -40,12 +42,13 @@ func (p Provisioner) toJsonSchema() Schema {
 		},
 	}
 	properties["System"] = p.Match
+
 	return Schema{
-		"$id": "provisioner.json",
-		"title": "Provisioner",
-		"type":     "object",
-		"required": []string{"Resource", "System"},
-		"properties": properties,
+		"$id":                  "provisioner.json",
+		"title":                "Provisioner",
+		"type":                 "object",
+		"required":             []string{"Resource", "System"},
+		"properties":           properties,
 		"additionalProperties": false,
 	}
 }

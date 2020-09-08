@@ -10,8 +10,8 @@ import (
 type ProviderAPI map[string]ProviderAPIResources
 
 type ProviderAPIResources struct {
-	Implicit map[string]Schema `json:"implicit"`
-	Providers []Provider       `json:"providers"`
+	Implicit  map[string]Schema `json:"implicit"`
+	Providers []Provider        `json:"providers"`
 }
 
 type Provider struct {
@@ -32,15 +32,16 @@ type ProviderAPIResourcesParam struct {
 }
 
 type ImplicitTask struct {
-	Name string `yaml:"resource"`
-	Args map[string]interface{} `json:"args"`
-	Type string
+	Name   string                 `yaml:"resource"`
+	Args   map[string]interface{} `json:"args"`
+	Type   string
 	Store  string
 	Action string
 }
 
 func (t ImplicitTask) resolve(values map[string]interface{}) map[string]interface{} {
-	var args = make(map[string]interface{})
+	args := make(map[string]interface{})
+
 	for paramName, paramValue := range t.Args {
 		result := fmt.Sprint(paramValue)
 		for resolvedParam, resolvedValue := range values {
@@ -51,41 +52,49 @@ func (t ImplicitTask) resolve(values map[string]interface{}) map[string]interfac
 				-1,
 			)
 		}
-		args[paramName]	= result
+
+		args[paramName] = result
 	}
+
 	return args
 }
 
-func (k ImplicitTask) getImplicitKeys() []string {
+func (t ImplicitTask) getImplicitKeys() []string {
 	re := regexp.MustCompile(`\$_[[:alpha:]]*`)
+
+	// nolint: prealloc
 	var keys []string
-	for _, value := range k.Args{
+
+	for _, value := range t.Args {
 		keys = append(keys, re.FindAllString(fmt.Sprint(value), -1)...)
 	}
+
 	return keys
 }
 
-func (p Provider) toJsonSchemaDefs() Schema {
+func (p Provider) toJSONSchemaDefs() Schema {
 	argsSchema := make(Schema)
 	for param, def := range p.Parameters {
-		argsSchema[param] = def.toJsonSchema(p.Implicit, param)
+		argsSchema[param] = def.toJSONSchema(p.Implicit, param)
 	}
+
 	return argsSchema
 }
 
-func (p Provider) toJsonSchema() Schema {
-	//var required []string
+func (p Provider) toJSONSchema() Schema {
+	// var required []string
 	properties := make(map[string]interface{})
 	argsSchema := make(Schema)
 	/*for param, def := range p.Parameters {
-		argsSchema[param] = def.toJsonSchema(p.Implicit, param)
+		argsSchema[param] = def.toJSONSchema(p.Implicit, param)
 		if def.Required {
 			 required = append(required, param)
 		}
 	}*/
 	for param := range p.Parameters {
-		argsSchema[param] = Schema{"$ref": fmt.Sprintf("%v",param)}
+		argsSchema[param] = Schema{"$ref": fmt.Sprintf("%v", param)}
 	}
+
 	properties["Resource"] = Schema{
 		"type": "object",
 		"properties": Schema{
@@ -96,26 +105,29 @@ func (p Provider) toJsonSchema() Schema {
 				"type": "string",
 			},
 			"args": Schema{
-				"type": "object",
+				"type":         "object",
 				"oeProperties": argsSchema,
 			},
 		},
 		"additionalProperties": false,
 	}
 	properties["System"] = p.Match
+
 	return Schema{
 		//"$id": "provider.json",
-		"title": "Provider",
-		"type":     "object",
-		"required": []string{"Resource", "System"},
+		"title":      "Provider",
+		"type":       "object",
+		"required":   []string{"Resource", "System"},
 		"properties": properties,
 	}
 }
 
-func (p ProviderAPIResourcesParam) toJsonSchema(resourceImplicit map[string]Schema, name string) Schema {
+func (p ProviderAPIResourcesParam) toJSONSchema(resourceImplicit map[string]Schema, name string) Schema {
 	if len(p.Implicit) > 0 {
 		implicitProperties := make(Schema)
+
 		var implicitArgs []string
+
 		for _, implicitTask := range p.Implicit {
 			for _, arg := range implicitTask.Args {
 				re := regexp.MustCompile(`\$_[[:alpha:]]*`)
@@ -124,21 +136,27 @@ func (p ProviderAPIResourcesParam) toJsonSchema(resourceImplicit map[string]Sche
 				}
 			}
 		}
+
 		var required []string
+
 		for param, def := range resourceImplicit {
 			if sort.SearchStrings(implicitArgs, param) != len(implicitArgs) {
 				implicitProperties[param] = def
+
 				required = append(required, param)
 			}
 		}
+
 		implicit := Schema{
-			"type": "object",
-			"$anchor": "implicit",
+			"type":       "object",
+			"$anchor":    "implicit",
 			"properties": implicitProperties,
 		}
+
 		if len(required) > 0 {
 			implicit["required"] = required
 		}
+
 		result := Schema{
 			"$id": fmt.Sprintf("%v", name),
 			"oneOf": []Schema{
@@ -146,30 +164,39 @@ func (p ProviderAPIResourcesParam) toJsonSchema(resourceImplicit map[string]Sche
 				implicit,
 			},
 		}
+
 		if p.Required {
 			result["oeRequired"] = true
 		}
+
 		return result
 	}
+
 	p.Explicit["$id"] = fmt.Sprintf("%v", name)
+
 	if p.Required {
 		p.Explicit["oeRequired"] = true
 	}
+
 	return p.Explicit
 }
 
 func (p Provider) getImplicitKeys() []string {
+	// nolint: prealloc
 	var keys []string
 	for key := range p.Implicit {
 		keys = append(keys, key)
 	}
+
 	return keys
 }
 
 func (p ProviderAPIResourcesParam) getImplicitKeys() []string {
+	// nolint: prealloc
 	var keys []string
 	for _, task := range p.Implicit {
 		keys = append(keys, task.getImplicitKeys()...)
 	}
+
 	return keys
 }

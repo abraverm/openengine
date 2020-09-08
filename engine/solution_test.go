@@ -143,8 +143,8 @@ func TestSolution_ToJson(t *testing.T) {
 				Output:         tt.fields.Output,
 				debug:          tt.fields.debug,
 			}
-			if got := s.ToJson(); got != tt.want {
-				t.Errorf("ToJson() = %v, want %v", got, tt.want)
+			if got := s.ToJSON(); got != tt.want {
+				t.Errorf("ToJSON() = %v, want %v", got, tt.want)
 			}
 		})
 	}

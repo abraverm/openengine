@@ -33,8 +33,8 @@ func TestProvisioner_toJsonSchema(t *testing.T) {
 				Debug:      tt.fields.Debug,
 				Required:   tt.fields.Required,
 			}
-			if got := p.toJsonSchema(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("toJsonSchema() = %v, want %v", got, tt.want)
+			if got := p.toJSONSchema(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("toJSONSchema() = %v, want %v", got, tt.want)
 			}
 		})
 	}
