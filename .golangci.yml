@@ -6,6 +6,7 @@ linters:
     - godox
     - typecheck
 issues:
+  exclude-use-default: false
   exclude-rules:
     - linters:
       - gosec

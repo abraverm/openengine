@@ -1,3 +1,4 @@
+// Package cmd contains all the subset commands of the oe CLI
 package cmd
 
 import (
@@ -72,7 +73,7 @@ func initLogger() {
 		FieldsOrder: []string{"component", "category"},
 	})
 
-	logFile, err := os.OpenFile(viper.GetString("log.file"), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	logFile, err := os.OpenFile(viper.GetString("log.file"), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
 		log.Fatal(err)
 	}

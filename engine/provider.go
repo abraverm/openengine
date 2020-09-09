@@ -7,13 +7,16 @@ import (
 	"strings"
 )
 
+// ProviderAPI is a list of resource types and their matching providers.
 type ProviderAPI map[string]ProviderAPIResources
 
+// ProviderAPIResources is a list of providers with common implicit parameters.
 type ProviderAPIResources struct {
 	Implicit  map[string]Schema `json:"implicit"`
 	Providers []Provider        `json:"providers"`
 }
 
+// Provider is an parameter API of a matching provider for a specific action on resource.
 type Provider struct {
 	Match      Schema
 	Implicit   map[string]Schema
@@ -23,14 +26,19 @@ type Provider struct {
 	Debug      bool
 }
 
+// ProviderParameters is a list of provider parameters and their conditions.
 type ProviderParameters map[string]ProviderAPIResourcesParam
 
+// A ProviderAPIResourcesParam is a set of conditions for the parameter to match.
+// The explicit conditions defined by the provider original API and implicit to explicit process that produces
+// a fitting explicit value using implicit (other) parameters.
 type ProviderAPIResourcesParam struct {
 	Required bool
 	Explicit Schema
 	Implicit []ImplicitTask
 }
 
+// ImplicitTask is a task part of the implicit to explicit procedure of explicit parameter value resolution.
 type ImplicitTask struct {
 	Name   string                 `yaml:"resource"`
 	Args   map[string]interface{} `json:"args"`

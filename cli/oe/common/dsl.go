@@ -1,3 +1,4 @@
+// Package common contains shared functions, types and const used by oe commands
 package common
 
 import (
@@ -7,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 
 	"github.com/abraverm/openengine/engine"
 	"github.com/goccy/go-yaml"
@@ -14,6 +16,7 @@ import (
 	"golang.org/x/xerrors"
 )
 
+// DSL is the result of processing the ie dsl file and manages the engine operations.
 type DSL struct {
 	API          []string          `yaml:"api"`
 	Provisioners []string          `yaml:"provisioners"`
@@ -55,7 +58,7 @@ func getSource(uri string) ([]byte, error) {
 			return nil, err
 		}
 	case fileExists(uri):
-		data, err := ioutil.ReadFile(uri)
+		data, err := ioutil.ReadFile(filepath.Clean(uri))
 		if err != nil {
 			return nil, fmt.Errorf("unable to read %w", err)
 		}
@@ -68,6 +71,7 @@ func getSource(uri string) ([]byte, error) {
 	return data, nil
 }
 
+// CreateEngine process dsl data and initialize the engine
 // nolint: funlen
 // TODO: function too long (70 > 60) .
 func (d *DSL) CreateEngine() {
@@ -143,6 +147,7 @@ func (d *DSL) CreateEngine() {
 	d.Engine = *e
 }
 
+// Run ignites the engine and get it to run found solutions for give action.
 func (d DSL) Run(action string) error {
 	if err := d.Engine.Schedule(action); err != nil {
 		return err

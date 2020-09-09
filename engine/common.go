@@ -5,15 +5,20 @@ import (
 	"regexp"
 )
 
+// Schema is the top-level structure defining a json schema.
+// TODO: how about using jsonschema directly instead?
 type Schema map[string]interface{}
 
+// System is a provider instance that contains matching values and other metadata such as credentials.
 type System map[string]interface{}
 
+// Resource is the user requested resource with its type and parameters.
 type Resource struct {
 	Name string                 `yaml:"resource"`
 	Args map[string]interface{} `json:"args"`
 }
 
+// Schedule is a collection of solutions for a specific resource.
 type Schedule struct {
 	resource  Resource
 	solutions []Solution

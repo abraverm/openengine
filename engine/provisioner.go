@@ -2,8 +2,10 @@ package engine
 
 import "fmt"
 
+// ProvisionerAPI is a list of resource types and their provisioners.
 type ProvisionerAPI map[string]map[string][]Provisioner
 
+// Provisioner is a provisioning script that supports specific provider, resource type and action upon it.
 type Provisioner struct {
 	Resource   string
 	Parameters map[string]Schema

@@ -13,6 +13,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// A Solution is a match of requested resource, given system, provider definition and a provisioner logic.
 // nolint: maligned
 // TODO: Fix order.
 type Solution struct {
@@ -29,18 +30,20 @@ type Solution struct {
 	debug          bool
 }
 
+// A Param is a resolution tree metadata about a solution parameter used in the resolving process.
+type Param struct {
+	resolved  bool
+	tasks     []Task
+	paramType string
+}
+
+// A Task is a resolution tree metadata about a solution parameter task used in the resolving process.
 type Task struct {
 	taskType     string
 	resolved     bool
 	alternatives []Solution
 	tool         Tool
 	solution     Solution
-}
-
-type Param struct {
-	resolved  bool
-	tasks     []Task
-	paramType string
 }
 
 type solutionList []Solution
@@ -122,6 +125,7 @@ func (s *Solution) resolveExplicit() []string {
 	return implicit
 }
 
+// Run solution will resolve implicit arguments and execute solution script
 // nolint: funlen, gocognit, nestif
 // TODO: function is too long and complicatd.
 func (s Solution) Run(solutionArgs map[string]interface{}) (string, error) {
@@ -338,6 +342,7 @@ func (s Solution) decouple() []Solution {
 	return decoupled
 }
 
+// MarshalJSON converts the solution to a JSON.
 func (s Solution) MarshalJSON() ([]byte, error) {
 	j, err := json.Marshal(struct {
 		Debug       bool
@@ -367,6 +372,7 @@ func (s Solution) MarshalJSON() ([]byte, error) {
 	return j, nil
 }
 
+// ToJSON converts the solution to a JSON string.
 func (s Solution) ToJSON() string {
 	data := map[string]interface{}{
 		"debug":    s.debug,

@@ -9,14 +9,17 @@ import (
 	"text/template"
 )
 
+// ToolAPI is a list of tools.
 type ToolAPI map[string]Tool
 
+// A Tool is a shell script that only requires parameters for proper execution.
 type Tool struct {
 	Name       string
 	Parameters map[string]interface{}
 	Script     string
 }
 
+// Run tool script with given parameters.
 func (t Tool) Run(args map[string]interface{}) (string, error) {
 	file, err := ioutil.TempFile("", "script.*.sh")
 	if err != nil {
