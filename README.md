@@ -3,6 +3,7 @@
 ![release](https://github.com/abraverm/openengine/workflows/release/badge.svg?event=push)
 ![lint](https://github.com/abraverm/openengine/workflows/lint/badge.svg?branch=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/abraverm/openengine)](https://goreportcard.com/report/github.com/abraverm/openengine)
+![License](https://img.shields.io/github/license/abraverm/openengine?color=green)
 
 # Getting started
 
