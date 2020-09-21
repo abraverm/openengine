@@ -2,196 +2,71 @@ package engine
 
 import (
 	"context"
-	"github.com/qri-io/jsonpointer"
-	"github.com/qri-io/jsonschema"
-	"reflect"
+	"encoding/json"
+	"io/ioutil"
+	"path/filepath"
 	"testing"
+
+	"github.com/qri-io/jsonschema"
 )
 
-func TestNewOeProperties(t *testing.T) {
-	tests := []struct {
-		name string
-		want jsonschema.Keyword
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := NewOeProperties(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewOeProperties() = %v, want %v", got, tt.want)
+// TestSet is a json-based set of tests
+// JSON-Schema comes with a lovely JSON-based test suite:
+// https://github.com/json-schema-org/JSON-Schema-Test-Suite
+type TestSet struct {
+	Description string             `json:"description"`
+	Schema      *jsonschema.Schema `json:"schema"`
+	Tests       []TestCase         `json:"tests"`
+}
+
+type TestCase struct {
+	Description string      `json:"description"`
+	Data        interface{} `json:"data"`
+	Valid       bool        `json:"valid"`
+}
+
+func runJSONTests(t *testing.T, testFilepaths []string) {
+	tests := 0
+	passed := 0
+	ctx := context.Background()
+	for _, path := range testFilepaths {
+		t.Run(path, func(t *testing.T) {
+			base := filepath.Base(path)
+			testSets := []*TestSet{}
+			data, err := ioutil.ReadFile(path)
+			if err != nil {
+				t.Errorf("error loading test file: %s", err.Error())
+				return
+			}
+
+			if err := json.Unmarshal(data, &testSets); err != nil {
+				t.Errorf("error unmarshaling test set %s from JSON: %s", base, err.Error())
+				return
+			}
+
+			for _, ts := range testSets {
+				sc := ts.Schema
+				for i, c := range ts.Tests {
+					tests++
+					validationState := sc.Validate(ctx, c.Data)
+					if validationState.IsValid() != c.Valid {
+						t.Errorf("%s: %s test case %d: %s. error: %s", base, ts.Description, i, c.Description, *validationState.Errs)
+					} else {
+						passed++
+					}
+				}
 			}
 		})
 	}
+	t.Logf("%d/%d tests passed", passed, tests)
 }
 
-func TestNewOeRequired(t *testing.T) {
-	tests := []struct {
-		name string
-		want jsonschema.Keyword
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := NewOeRequired(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewOeRequired() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestOeProperties_JSONChildren(t *testing.T) {
-	tests := []struct {
-		name    string
-		o       OeProperties
-		wantRes map[string]jsonschema.JSONPather
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if gotRes := tt.o.JSONChildren(); !reflect.DeepEqual(gotRes, tt.wantRes) {
-				t.Errorf("JSONChildren() = %v, want %v", gotRes, tt.wantRes)
-			}
-		})
-	}
-}
-
-func TestOeProperties_JSONProp(t *testing.T) {
-	type args struct {
-		name string
-	}
-	tests := []struct {
-		name string
-		o    OeProperties
-		args args
-		want interface{}
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.o.JSONProp(tt.args.name); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("JSONProp() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestOeProperties_Register(t *testing.T) {
-	type args struct {
-		uri      string
-		registry *jsonschema.SchemaRegistry
-	}
-	tests := []struct {
-		name string
-		o    OeProperties
-		args args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-		})
-	}
-}
-
-func TestOeProperties_Resolve(t *testing.T) {
-	type args struct {
-		pointer jsonpointer.Pointer
-		uri     string
-	}
-	tests := []struct {
-		name string
-		o    OeProperties
-		args args
-		want *jsonschema.Schema
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.o.Resolve(tt.args.pointer, tt.args.uri); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Resolve() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestOeProperties_ValidateKeyword(t *testing.T) {
-	type args struct {
-		ctx          context.Context
-		currentState *jsonschema.ValidationState
-		data         interface{}
-	}
-	tests := []struct {
-		name string
-		o    OeProperties
-		args args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-		})
-	}
-}
-
-func Test_oeRequired_Register(t *testing.T) {
-	type args struct {
-		uri      string
-		registry *jsonschema.SchemaRegistry
-	}
-	tests := []struct {
-		name string
-		f    oeRequired
-		args args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-		})
-	}
-}
-
-func Test_oeRequired_Resolve(t *testing.T) {
-	type args struct {
-		pointer jsonpointer.Pointer
-		uri     string
-	}
-	tests := []struct {
-		name string
-		f    oeRequired
-		args args
-		want *jsonschema.Schema
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.f.Resolve(tt.args.pointer, tt.args.uri); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Resolve() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_oeRequired_ValidateKeyword(t *testing.T) {
-	type args struct {
-		ctx          context.Context
-		currentState *jsonschema.ValidationState
-		data         interface{}
-	}
-	tests := []struct {
-		name string
-		f    oeRequired
-		args args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-		})
-	}
+func TestOeKeywords(t *testing.T) {
+	jsonschema.LoadDraft2019_09()
+	jsonschema.RegisterKeyword("oeProperties", NewOeProperties)
+	jsonschema.RegisterKeyword("oeRequired", NewOeRequired)
+	runJSONTests(t, []string{
+		"testdata/oeRequired.json",
+		"testdata/oeProperties.json",
+	})
 }

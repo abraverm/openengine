@@ -1,0 +1,597 @@
+[
+  {
+    "description": "Simple engine",
+    "engine": {
+      "systems": [
+        {
+          "providerType": "Openstack"
+        }
+      ],
+      "resources": [
+        {
+          "Name": "Server",
+          "args": {
+            "flavorRef": "m2.large",
+            "imageRef": "Fedora-31",
+            "key_name": "ccit",
+            "networks": "ccit-net"
+          }
+        }
+      ],
+      "providers": [
+        {
+          "match": {
+            "properties": {
+              "providerType": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "implicit": null,
+          "resource": "Server",
+          "action": "create",
+          "parameters": {
+            "flavorRef": {
+              "required": true,
+              "explicit": {
+                "$id": "flavorRef",
+                "oeRequired": true,
+                "type": "string"
+              },
+              "implicit": null
+            },
+            "imageRef": {
+              "required": true,
+              "explicit": {
+                "$id": "imageRef",
+                "oeRequired": true,
+                "type": "string"
+              },
+              "implicit": null
+            },
+            "key_name": {
+              "required": false,
+              "explicit": {
+                "$id": "key_name",
+                "type": "string"
+              },
+              "implicit": null
+            },
+            "name": {
+              "required": true,
+              "explicit": {
+                "type": "string"
+              },
+              "implicit": [
+                {
+                  "resource": "NameGenerator",
+                  "args": {
+                    "random": true
+                  },
+                  "type": "tool",
+                  "store": "name",
+                  "action": "create"
+                }
+              ]
+            },
+            "networks": {
+              "required": true,
+              "explicit": {
+                "$id": "networks",
+                "oeRequired": true,
+                "type": "string"
+              },
+              "implicit": null
+            }
+          },
+          "debug": false
+        }
+      ],
+      "provisioners": [
+        {
+          "resource": "Server",
+          "parameters": {
+            "flavorRef": {
+              "type": "string"
+            },
+            "imageRef": {
+              "type": "string"
+            },
+            "key_name": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "networks": {
+              "type": "string"
+            }
+          },
+          "match": {
+            "properties": {
+              "providerType": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "action": "create",
+          "logic": "linchpin_openstack_create.tmpl",
+          "debug": false,
+          "required": [
+            "name",
+            "flavorRef",
+            "imageRef",
+            "key_name"
+          ]
+        }
+      ],
+      "solutions": [
+        {
+          "action": "create",
+          "debug": false,
+          "provider": {
+            "match": {
+              "properties": {
+                "providerType": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "implicit": null,
+            "resource": "Server",
+            "action": "create",
+            "parameters": {
+              "flavorRef": {
+                "required": true,
+                "explicit": {
+                  "$id": "flavorRef",
+                  "oeRequired": true,
+                  "type": "string"
+                },
+                "implicit": null
+              },
+              "imageRef": {
+                "required": true,
+                "explicit": {
+                  "$id": "imageRef",
+                  "oeRequired": true,
+                  "type": "string"
+                },
+                "implicit": null
+              },
+              "key_name": {
+                "required": false,
+                "explicit": {
+                  "$id": "key_name",
+                  "type": "string"
+                },
+                "implicit": null
+              },
+              "name": {
+                "required": true,
+                "explicit": {
+                  "type": "string"
+                },
+                "implicit": [
+                  {
+                    "resource": "NameGenerator",
+                    "args": {
+                      "random": true
+                    },
+                    "type": "tool",
+                    "store": "name",
+                    "action": "create"
+                  }
+                ]
+              },
+              "networks": {
+                "required": true,
+                "explicit": {
+                  "$id": "networks",
+                  "oeRequired": true,
+                  "type": "string"
+                },
+                "implicit": null
+              }
+            },
+            "debug": false
+          },
+          "provisioner": {
+            "resource": "Server",
+            "parameters": {
+              "flavorRef": {
+                "type": "string"
+              },
+              "imageRef": {
+                "type": "string"
+              },
+              "key_name": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "networks": {
+                "type": "string"
+              }
+            },
+            "match": {
+              "properties": {
+                "providerType": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "action": "create",
+            "logic": "linchpin_openstack_create.tmpl",
+            "debug": false,
+            "required": [
+              "name",
+              "flavorRef",
+              "imageRef",
+              "key_name"
+            ]
+          },
+          "resolution_tree": {
+            "flavorRef": {
+              "resolved": true,
+              "tasks": null,
+              "param_type": "explicit"
+            },
+            "imageRef": {
+              "resolved": true,
+              "tasks": null,
+              "param_type": "explicit"
+            },
+            "key_name": {
+              "resolved": true,
+              "tasks": null,
+              "param_type": "explicit"
+            },
+            "name": {
+              "resolved": true,
+              "tasks": [
+                {
+                  "task_type": "tool",
+                  "resolved": true,
+                  "alternatives": null,
+                  "tool": {
+                    "name": "NameGenerator",
+                    "parameters": {
+                      "random": {
+                        "type": "boolean"
+                      }
+                    },
+                    "script": "name_generator.sh"
+                  },
+                  "solution": {
+                    "action": "",
+                    "debug": false,
+                    "provider": {
+                      "match": null,
+                      "implicit": null,
+                      "resource": "",
+                      "action": "",
+                      "parameters": null,
+                      "debug": false
+                    },
+                    "provisioner": {
+                      "resource": "",
+                      "parameters": null,
+                      "match": null,
+                      "action": "",
+                      "logic": "",
+                      "debug": false,
+                      "required": null
+                    },
+                    "resolution_tree": null,
+                    "resolved": false,
+                    "resource": {
+                      "Name": "",
+                      "args": null
+                    },
+                    "size": 0,
+                    "system": null
+                  }
+                }
+              ],
+              "param_type": "implicit"
+            },
+            "networks": {
+              "resolved": true,
+              "tasks": null,
+              "param_type": "explicit"
+            }
+          },
+          "resolved": true,
+          "resource": {
+            "Name": "Server",
+            "args": {
+              "flavorRef": "m2.large",
+              "imageRef": "Fedora-31",
+              "key_name": "ccit",
+              "networks": "ccit-net"
+            }
+          },
+          "size": 0,
+          "system": {
+            "providerType": "Openstack"
+          }
+        }
+      ],
+      "tools": [
+        {
+          "name": "NameGenerator",
+          "parameters": {
+            "random": {
+              "type": "boolean"
+            }
+          },
+          "script": "name_generator.sh"
+        }
+      ]
+    },
+    "tests": [
+      {
+        "description": "Add empty provisioner",
+        "action": "AddProvisioner",
+        "args": [
+          {
+            "resource": "",
+            "parameters": {},
+            "match": {},
+            "action": "",
+            "logic": "",
+            "debug": false,
+            "required": []
+          }
+        ],
+        "want": [
+            {
+            "systems": [],
+            "providers": [],
+            "resources": [],
+            "provisioners": [
+              {
+                "resource": "",
+                "parameters": {},
+                "match": {},
+                "action": "",
+                "logic": "",
+                "debug": false,
+                "required": []
+              }
+            ],
+            "solutions": [],
+            "tools": [],
+            "schedule_order": []
+          }
+        ]
+      },
+      {
+        "description": "Add empty provider API",
+        "action": "AddProvider",
+        "args": [
+          {
+            "empty": {
+              "implicit": {},
+              "providers": [
+                {
+                  "match": {},
+                  "implicit": {},
+                  "resource": {},
+                  "action": "",
+                  "parameters": {},
+                  "debug": false
+                }
+              ]
+            }
+          }
+        ],
+        "want": [
+          {
+            "systems": [],
+            "providers": [
+              {
+                "match": {},
+                "implicit": {},
+                "resource": "empty",
+                "action": "",
+                "parameters": {},
+                "debug": false
+              }
+            ],
+            "resources": [],
+            "provisioners": [],
+            "solutions": [],
+            "tools": [],
+            "schedule_order": []
+          }
+        ]
+      },
+      {
+        "description": "Add empty system",
+        "action": "AddSystem",
+        "args": [
+          {}
+        ],
+        "want": [
+          {
+            "systems": [{}],
+            "providers": [],
+            "resources": [],
+            "provisioners": [],
+            "solutions": [],
+            "tools": [],
+            "schedule_order": []
+          }
+        ]
+      },
+      {
+        "description": "Add empty resource",
+        "action": "AddResource",
+        "args": [
+          {
+            "resource": "",
+            "args": {}
+          }
+        ],
+        "want": [
+          {
+            "systems": [],
+            "providers": [],
+            "resources": [{
+              "Name": "",
+              "args": {}
+            }],
+            "provisioners": [],
+            "solutions": [],
+            "tools": [],
+            "schedule_order": []
+          }
+        ]
+      },
+      {
+        "description": "Add empty tool API",
+        "action": "AddTool",
+        "args": [{}],
+        "want": [
+          {
+            "systems": [],
+            "providers": [],
+            "resources": [],
+            "provisioners": [],
+            "solutions": [],
+            "tools": [],
+            "schedule_order": []
+          }
+        ]
+      },
+      {
+        "description": "Run match",
+        "action": "Match",
+        "args": [],
+        "want": [
+          {
+            "systems": [],
+            "providers": [],
+            "resources": [],
+            "provisioners": [],
+            "solutions": [],
+            "tools": [],
+            "schedule_order": []
+          }
+        ]
+      },
+      {
+        "description": "Run resolve",
+        "action": "Resolve",
+        "args": [],
+        "want": [
+          {
+          }
+        ]
+      },
+      {
+        "description": "Run",
+        "action": "Run",
+        "args": [],
+        "want": [
+          [],
+          null
+        ]
+      },
+      {
+        "description": "Find valid solutions and order by size (none)",
+        "action": "Schedule",
+        "args": [
+          "create"
+        ],
+        "want": [
+          null
+        ]
+      },
+      {
+        "description": "Get engine solutions",
+        "action": "GetSolutions",
+        "args": [],
+        "want": [
+          null
+        ]
+      },
+      {
+        "description": "Gets a tool that matches the Implicit task",
+        "action": "getTool",
+        "args": [
+          {
+            "resource": "ExampleTool",
+            "args": {},
+            "type": "tool",
+            "action": "get",
+            "store": "example"
+          }
+        ],
+        "want": [
+          {
+            "name": "",
+            "parameters": null,
+            "script": ""
+          },
+          "tool ExampleTool not found"
+        ]
+      },
+      {
+        "description": "Match provisioner and provider",
+        "action": "matchProvidersProvisioners",
+        "args": [
+          {},
+          {}
+        ],
+        "want": [
+          null,
+          null
+        ]
+      },
+      {
+        "description": "Resolve empty solution and empty engine",
+        "action": "resolveDependencies",
+        "args": [{}],
+        "want": [
+          {
+            "action": "",
+            "debug": false,
+            "provider": {
+              "match": null,
+              "implicit": null,
+              "resource": "",
+              "action": "",
+              "parameters": null,
+              "debug": false
+            },
+            "provisioner": {
+              "parameters": null,
+              "match": null,
+              "action": "",
+              "logic": "",
+              "debug": false,
+              "required": null,
+              "resource": ""
+            },
+            "resolution_tree": {},
+            "resolved": true,
+            "resource": {
+              "args": null,
+              "Name": ""
+            },
+            "size": 0,
+            "system": null
+          }
+        ]
+      }
+    ]
+  }
+]

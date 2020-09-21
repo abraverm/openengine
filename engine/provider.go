@@ -18,12 +18,12 @@ type ProviderAPIResources struct {
 
 // Provider is an parameter API of a matching provider for a specific action on resource.
 type Provider struct {
-	Match      Schema
-	Implicit   map[string]Schema
-	Resource   string
-	Action     string
-	Parameters ProviderParameters
-	Debug      bool
+	Match      Schema             `json:"match"`
+	Implicit   map[string]Schema  `json:"implicit"`
+	Resource   string             `json:"resource"`
+	Action     string             `json:"action"`
+	Parameters ProviderParameters `json:"parameters"`
+	Debug      bool               `json:"debug"`
 }
 
 // ProviderParameters is a list of provider parameters and their conditions.
@@ -33,18 +33,18 @@ type ProviderParameters map[string]ProviderAPIResourcesParam
 // The explicit conditions defined by the provider original API and implicit to explicit process that produces
 // a fitting explicit value using implicit (other) parameters.
 type ProviderAPIResourcesParam struct {
-	Required bool
-	Explicit Schema
-	Implicit []ImplicitTask
+	Required bool           `json:"required"`
+	Explicit Schema         `json:"explicit"`
+	Implicit []ImplicitTask `json:"implicit"`
 }
 
 // ImplicitTask is a task part of the implicit to explicit procedure of explicit parameter value resolution.
 type ImplicitTask struct {
-	Name   string                 `yaml:"resource"`
+	Name   string                 `yaml:"resource" json:"resource"`
 	Args   map[string]interface{} `json:"args"`
-	Type   string
-	Store  string
-	Action string
+	Type   string                 `json:"type"`
+	Store  string                 `json:"store"`
+	Action string                 `json:"action"`
 }
 
 func (t ImplicitTask) resolve(values map[string]interface{}) map[string]interface{} {

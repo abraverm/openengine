@@ -164,3 +164,8 @@ func (d DSL) Run(action string) error {
 
 	return nil
 }
+
+// GetSolutions wrapper function?
+func (d *DSL) GetSolutions() []engine.Solution {
+	return d.Engine.GetSolutions()
+}

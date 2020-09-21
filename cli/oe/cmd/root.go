@@ -20,8 +20,8 @@ var (
 	logFile os.File
 	rootCmd = &cobra.Command{
 		Use:   "openengine",
-		Short: "Borderline command line tool",
-		Long:  `CLI for processing DSL Borderline engine `,
+		Short: "OpenEgnine command line tool",
+		Long:  `CLI for processing DSL OpenEngine `,
 	}
 )
 
@@ -29,7 +29,7 @@ var (
 func Execute() (err error) {
 	defer func() {
 		if logErr := logFile.Close(); logErr != nil {
-			err = logErr
+			err = fmt.Errorf("failed to close log file: %w", logErr)
 		}
 	}()
 
@@ -49,6 +49,7 @@ func init() {
 	rootCmd.PersistentFlags().StringP("dsl", "b", "bdsl.yaml", "DSL file")
 	rootCmd.PersistentFlags().BoolP("debug", "d", false, "Debug log level")
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Print log to stdout")
+	rootCmd.PersistentFlags().BoolP("noop", "n", false, "No Operation")
 }
 
 func initConfig() {
@@ -61,6 +62,7 @@ func initConfig() {
 	}
 
 	_ = viper.BindPFlag("dsl", rootCmd.PersistentFlags().Lookup("dsl"))
+	_ = viper.BindPFlag("noop", rootCmd.PersistentFlags().Lookup("noop"))
 	_ = viper.BindPFlag("log.debug", rootCmd.PersistentFlags().Lookup("debug"))
 	_ = viper.BindPFlag("log.verbose", rootCmd.PersistentFlags().Lookup("verbose"))
 	viper.SetDefault("log.file", "openengine.log")
@@ -80,7 +82,7 @@ func initLogger() {
 
 	log.SetOutput(logFile)
 
-	if viper.GetBool(("log.verbose")) {
+	if viper.GetBool("log.verbose") {
 		mw := io.MultiWriter(os.Stdout, logFile)
 		log.SetOutput(mw)
 	}

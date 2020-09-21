@@ -1,0 +1,15 @@
+{
+  "empty": {
+    "implicit": {},
+    "providers": [
+      {
+        "match": {},
+        "implicit": {},
+        "resource": {},
+        "action": "",
+        "parameters": {},
+        "debug": false
+      }
+    ]
+  }
+}

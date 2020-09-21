@@ -1,8 +1,9 @@
 package engine
 
 import (
-	"reflect"
 	"testing"
+
+	"github.com/go-test/deep"
 )
 
 func TestProvisioner_toJsonSchema(t *testing.T) {
@@ -20,7 +21,83 @@ func TestProvisioner_toJsonSchema(t *testing.T) {
 		fields fields
 		want   Schema
 	}{
-		// TODO: Add test cases.
+		{
+			name: "empty",
+			fields: fields{
+				Resource:   "empty",
+				Parameters: nil,
+				Match:      Schema{},
+				Action:     "",
+				Logic:      "",
+				Debug:      false,
+				Required:   nil,
+			},
+			want: Schema{
+				"title":                "Provisioner",
+				"type":                 "object",
+				"$id":                  "provisioner.json",
+				"additionalProperties": false,
+				"properties": map[string]interface{}{
+					"Resource": Schema{
+						"type": "object",
+						"properties": Schema{
+							"Name": Schema{
+								"const": "empty",
+							},
+							"args": Schema{
+								"oeProperties": map[string]interface{}{},
+								"type":         "object",
+							},
+						},
+					},
+					"System": Schema{},
+				},
+				"required": []string{"Resource", "System"},
+			},
+		},
+		{
+			name: "simple",
+			fields: fields{
+				Resource: "empty",
+				Parameters: map[string]Schema{
+					"key": {"type": "string"},
+				},
+				Match:    Schema{},
+				Action:   "",
+				Logic:    "",
+				Debug:    false,
+				Required: nil,
+			},
+			want: Schema{
+				"title":                "Provisioner",
+				"type":                 "object",
+				"$id":                  "provisioner.json",
+				"additionalProperties": false,
+				"properties": map[string]interface{}{
+					"Resource": Schema{
+						"type": "object",
+						"properties": Schema{
+							"Name": Schema{
+								"const": "empty",
+							},
+							"args": Schema{
+								"oeProperties": map[string]interface{}{
+									"key": Schema{
+										"oneOf": []Schema{
+											{"type": "string"},
+											{"$ref": "key#implicit"},
+										},
+									},
+								},
+								"type": "object",
+							},
+						},
+					},
+					"System": Schema{},
+				},
+				"required": []string{"Resource", "System"},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -33,8 +110,9 @@ func TestProvisioner_toJsonSchema(t *testing.T) {
 				Debug:      tt.fields.Debug,
 				Required:   tt.fields.Required,
 			}
-			if got := p.toJSONSchema(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("toJSONSchema() = %v, want %v", got, tt.want)
+			got := p.toJSONSchema()
+			if diff := deep.Equal(got, tt.want); diff != nil {
+				t.Error(diff)
 			}
 		})
 	}
