@@ -4,6 +4,7 @@
 ![lint](https://github.com/abraverm/openengine/workflows/lint/badge.svg?branch=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/abraverm/openengine)](https://goreportcard.com/report/github.com/abraverm/openengine)
 ![License](https://img.shields.io/github/license/abraverm/openengine?color=green)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/abraverm/openengine)](https://pkg.go.dev/github.com/abraverm/openengine)
 
 # Getting started
 
