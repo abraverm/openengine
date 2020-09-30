@@ -7,13 +7,13 @@ type ProvisionerAPI map[string]map[string][]Provisioner
 
 // Provisioner is a provisioning script that supports specific provider, resource type and action upon it.
 type Provisioner struct {
-	Resource   string
-	Parameters map[string]Schema
-	Match      Schema
-	Action     string
-	Logic      string
-	Debug      bool
-	Required   []string
+	Resource   string            `json:"resource"`
+	Parameters map[string]Schema `json:"parameters"`
+	Match      Schema            `json:"match"`
+	Action     string            `json:"action"`
+	Logic      string            `json:"logic"`
+	Debug      bool              `json:"debug"`
+	Required   []string          `json:"required"`
 }
 
 func (p Provisioner) toJSONSchema() Schema {

@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
 
@@ -43,6 +45,14 @@ func deploy(cmd *cobra.Command, args []string) {
 	}
 
 	dsl.CreateEngine()
+
+	if viper.GetBool("noop") {
+		engineJSON, _ := json.MarshalIndent(dsl.Engine, "", "  ")
+
+		fmt.Println(string(engineJSON))
+
+		return
+	}
 
 	if err := dsl.Run("create"); err != nil {
 		log.Fatalf("Engine failed to run:\n%v", err)

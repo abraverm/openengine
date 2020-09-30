@@ -18,6 +18,58 @@ func TestTool_Run(t1 *testing.T) {
 		want    string
 		wantErr bool
 	}{
+		{
+			name: "no_script",
+			fields: fields{
+				Name:       "TestTool",
+				Parameters: nil,
+				Script:     "",
+			},
+			args: args{
+				args: nil,
+			},
+			want:    "",
+			wantErr: true,
+		},
+		{
+			name: "script_not_exists",
+			fields: fields{
+				Name:       "TestTool",
+				Parameters: nil,
+				Script:     "nil",
+			},
+			args: args{
+				args: nil,
+			},
+			want:    "",
+			wantErr: true,
+		},
+		{
+			name: "script_exists",
+			fields: fields{
+				Name:       "TestTool",
+				Parameters: nil,
+				Script:     "testdata/tool_empty.sh",
+			},
+			args: args{
+				args: nil,
+			},
+			want:    "",
+			wantErr: false,
+		},
+		{
+			name: "script_failed",
+			fields: fields{
+				Name:       "TestTool",
+				Parameters: nil,
+				Script:     "testdata/tool_failed.sh",
+			},
+			args: args{
+				args: nil,
+			},
+			want:    "",
+			wantErr: true,
+		},
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {

@@ -14,13 +14,13 @@ import (
 
 // An Engine is the OpenEngine interface - all actions should be done using it.
 type Engine struct {
-	systems      []System
-	resources    []Resource
-	providers    []Provider
-	provisioners []Provisioner
-	solutions    []Solution
-	tools        []Tool
-	schedule     []Schedule
+	Systems       []System      `json:"systems"`
+	Resources     []Resource    `json:"resources"`
+	Providers     []Provider    `json:"providers"`
+	Provisioners  []Provisioner `json:"provisioners"`
+	Solutions     []Solution    `json:"solutions"`
+	Tools         []Tool        `json:"tools"`
+	ScheduleOrder []Schedule    `json:"schedule_order"`
 }
 
 // NewEngine creates a new engine instance.
@@ -30,12 +30,12 @@ func NewEngine() *Engine {
 
 // AddSystem will add a system to the engine.
 func (e *Engine) AddSystem(system System) {
-	e.systems = append(e.systems, system)
+	e.Systems = append(e.Systems, system)
 }
 
 // AddResource will add a resource to the engine.
 func (e *Engine) AddResource(resource Resource) {
-	e.resources = append(e.resources, resource)
+	e.Resources = append(e.Resources, resource)
 }
 
 // AddProvider will add a provider to the engine.
@@ -44,21 +44,21 @@ func (e *Engine) AddProvider(api ProviderAPI) {
 		for _, provider := range resource.Providers {
 			provider.Implicit = resource.Implicit
 			provider.Resource = resourceType
-			e.providers = append(e.providers, provider)
+			e.Providers = append(e.Providers, provider)
 		}
 	}
 }
 
 // AddProvisioner will add a provisioner to the engine.
 func (e *Engine) AddProvisioner(provisioner Provisioner) {
-	e.provisioners = append(e.provisioners, provisioner)
+	e.Provisioners = append(e.Provisioners, provisioner)
 }
 
 // AddTool will add a tool to the engine.
 func (e *Engine) AddTool(api ToolAPI) {
 	for name, tool := range api {
 		tool.Name = name
-		e.tools = append(e.tools, tool)
+		e.Tools = append(e.Tools, tool)
 	}
 }
 
@@ -71,14 +71,14 @@ func (e *Engine) Match() error {
 	jsonschema.RegisterKeyword("oeProperties", NewOeProperties)
 	jsonschema.RegisterKeyword("oeRequired", NewOeRequired)
 
-	for _, resource := range e.resources {
-		for _, system := range e.systems {
+	for _, resource := range e.Resources {
+		for _, system := range e.Systems {
 			solutions, err := e.matchProvidersProvisioners(resource, system)
 			if err != nil {
 				return err
 			}
 
-			e.solutions = append(e.solutions, solutions...)
+			e.Solutions = append(e.Solutions, solutions...)
 		}
 	}
 
@@ -103,8 +103,8 @@ func (e Engine) matchProvidersProvisioners(resource Resource, system System) ([]
 		"System":   system,
 	}
 
-	for _, provider := range e.providers {
-		for _, provisioner := range e.provisioners {
+	for _, provider := range e.Providers {
+		for _, provisioner := range e.Provisioners {
 			pnpSchema := Schema{
 				"$id":   "engine.json",
 				"$defs": provider.toJSONSchemaDefs(),
@@ -167,15 +167,16 @@ func (e Engine) matchProvidersProvisioners(resource Resource, system System) ([]
 // In case of resources, other solutions are needed, and might be more than one alternative. The dependent solutions
 // are also resolved recursively. Unresolved solutions are removed from engine's solutions list.
 func (e *Engine) Resolve() {
-	var solutions []Solution
-	for _, solution := range e.solutions {
+	solutions := []Solution{}
+
+	for _, solution := range e.Solutions {
 		newSolution := e.resolveDependencies(solution)
 		if newSolution.resolved || newSolution.debug {
 			solutions = append(solutions, newSolution)
 		}
 	}
 
-	e.solutions = solutions
+	e.Solutions = solutions
 }
 
 // nolint: funlen, nestif
@@ -204,9 +205,9 @@ func (e Engine) resolveDependencies(solution Solution) Solution {
 					resolved = false
 				} else {
 					tasks = append(tasks, Task{
-						taskType: "tool",
-						resolved: true,
-						tool:     tool,
+						TaskType: "tool",
+						Resolved: true,
+						Tool:     tool,
 					})
 				}
 			} else {
@@ -233,17 +234,17 @@ func (e Engine) resolveDependencies(solution Solution) Solution {
 					taskResolved = false
 				}
 				tasks = append(tasks, Task{
-					taskType:     "Resource",
-					resolved:     taskResolved,
-					alternatives: alternatives,
+					TaskType:     "resource",
+					Resolved:     taskResolved,
+					Alternatives: alternatives,
 				})
 			}
 		}
 
 		solution.resolutionTree[param] = Param{
-			paramType: "implicit",
-			resolved:  resolved,
-			tasks:     tasks,
+			ParamType: "implicit",
+			Resolved:  resolved,
+			Tasks:     tasks,
 		}
 	}
 
@@ -254,7 +255,7 @@ func (e Engine) resolveDependencies(solution Solution) Solution {
 
 // Gets a tool that matches the Implicit task.
 func (e Engine) getTool(task ImplicitTask) (Tool, error) {
-	for _, tool := range e.tools {
+	for _, tool := range e.Tools {
 		if tool.Name == task.Name {
 			return tool, nil
 		}
@@ -266,9 +267,10 @@ func (e Engine) getTool(task ImplicitTask) (Tool, error) {
 // Schedule will find solutions that can fulfil the request and order them by size.
 // Size of a solution is number of its dependent solutions.
 func (e *Engine) Schedule(action string) error {
-	for _, resource := range e.resources {
+	for _, resource := range e.Resources {
 		var solutions []Solution
-		for _, solution := range e.solutions {
+
+		for _, solution := range e.Solutions {
 			if reflect.DeepEqual(resource, solution.Resource) && solution.action == action {
 				solutions = append(solutions, solution)
 			}
@@ -287,7 +289,7 @@ func (e *Engine) Schedule(action string) error {
 
 		sort.Sort(solutionList(decoupled))
 
-		e.schedule = append(e.schedule, Schedule{
+		e.ScheduleOrder = append(e.ScheduleOrder, Schedule{
 			resource:  resource,
 			solutions: decoupled,
 		})
@@ -305,7 +307,7 @@ func (e Engine) Run() ([]string, error) {
 
 	failed := false
 OUTER:
-	for _, schedule := range e.schedule {
+	for _, schedule := range e.ScheduleOrder {
 		for _, solution := range schedule.solutions {
 			if result, err := solution.Run(map[string]interface{}{}); err == nil {
 				results = append(results, result)
@@ -329,5 +331,5 @@ OUTER:
 
 // GetSolutions returns engine current solutions.
 func (e *Engine) GetSolutions() []Solution {
-	return e.solutions
+	return e.Solutions
 }

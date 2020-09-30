@@ -15,7 +15,30 @@ func TestResource_getImplicitKeys(t *testing.T) {
 		fields fields
 		want   []string
 	}{
-		// TODO: Add test cases.
+		{name: "empty", fields: fields{
+			Name: "",
+			Args: map[string]interface{}{},
+		}, want: nil},
+		{
+			name: "no_match",
+			fields: fields{
+				Name: "",
+				Args: map[string]interface{}{
+					"key": "value",
+				},
+			},
+			want: nil,
+		},
+		{
+			name: "match_simple",
+			fields: fields{
+				Name: "",
+				Args: map[string]interface{}{
+					"$_key": "value",
+				},
+			},
+			want: []string{"$_key"},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -24,7 +47,7 @@ func TestResource_getImplicitKeys(t *testing.T) {
 				Args: tt.fields.Args,
 			}
 			if got := r.getImplicitKeys(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("getImplicitKeys() = %v, want %v", got, tt.want)
+				t.Errorf("getImplicitKeys() = %+v, want %+v", got, tt.want)
 			}
 		})
 	}

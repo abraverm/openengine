@@ -32,18 +32,18 @@ type Solution struct {
 
 // A Param is a resolution tree metadata about a solution parameter used in the resolving process.
 type Param struct {
-	resolved  bool
-	tasks     []Task
-	paramType string
+	Resolved  bool   `json:"resolved"`
+	Tasks     []Task `json:"tasks"`
+	ParamType string `json:"param_type"`
 }
 
 // A Task is a resolution tree metadata about a solution parameter task used in the resolving process.
 type Task struct {
-	taskType     string
-	resolved     bool
-	alternatives []Solution
-	tool         Tool
-	solution     Solution
+	TaskType     string     `json:"task_type"`
+	Resolved     bool       `json:"resolved"`
+	Alternatives []Solution `json:"alternatives"`
+	Tool         Tool       `json:"tool"`
+	Solution     Solution   `json:"solution"`
 }
 
 type solutionList []Solution
@@ -108,9 +108,9 @@ func (s *Solution) resolveExplicit() []string {
 	for param := range s.Provider.Parameters {
 		if _, ok := s.Resource.Args[param]; ok { // Explicit
 			s.resolutionTree[param] = Param{
-				paramType: "explicit",
-				resolved:  true,
-				tasks:     nil,
+				ParamType: "explicit",
+				Resolved:  true,
+				Tasks:     nil,
 			}
 
 			continue
@@ -141,11 +141,11 @@ func (s Solution) Run(solutionArgs map[string]interface{}) (string, error) {
 	}
 
 	for key, def := range s.resolutionTree {
-		if def.paramType == "explicit" {
+		if def.ParamType == "explicit" {
 			args[key] = s.Resource.Args[key]
 		} else {
 			taskResults := s.Resource.Args
-			for i, task := range def.tasks {
+			for i, task := range def.Tasks {
 				var store string
 				implicitTask := s.Provider.Parameters[key].Implicit[i]
 				if re.MatchString(implicitTask.Store) {
@@ -153,15 +153,15 @@ func (s Solution) Run(solutionArgs map[string]interface{}) (string, error) {
 				} else {
 					store = implicitTask.Store
 				}
-				if task.taskType == "tool" {
+				if task.TaskType == "tool" {
 					taskArgs := implicitTask.resolve(taskResults)
-					result, err := task.tool.Run(taskArgs)
+					result, err := task.Tool.Run(taskArgs)
 					if err != nil {
 						return "", err
 					}
 					taskResults[store] = result
 				} else {
-					result, err := task.solution.Run(taskResults)
+					result, err := task.Solution.Run(taskResults)
 					if err != nil {
 						return "", err
 					}
@@ -282,14 +282,14 @@ func (s Solution) decouple() []Solution {
 			tasks    [][]int
 		)
 
-		for b, task := range param.tasks { // recursion stop condition
-			if task.taskType == "Resource" { // recursion stop condition
+		for b, task := range param.Tasks { // recursion stop condition
+			if task.TaskType == "resource" { // recursion stop condition
 				placeholder[a] = map[int][]Solution{}
 
-				for _, alt := range task.alternatives {
+				for _, alt := range task.Alternatives {
 					for _, decoupledAlt := range alt.decouple() {
 						tmp := s
-						tmp.resolutionTree[a].tasks[b].solution = decoupledAlt
+						tmp.resolutionTree[a].Tasks[b].Solution = decoupledAlt
 						placeholder[a][b] = append(placeholder[a][b], decoupledAlt)
 					}
 				}
@@ -326,7 +326,7 @@ func (s Solution) decouple() []Solution {
 			for _, taskComb := range combTasks {
 				for taskMapID, taskAlt := range taskComb { // 1, a
 					taskPos := paramTasksMap[paramID][taskMapID] // t1
-					decoupledSolution.resolutionTree[paramName].tasks[taskPos].solution = placeholder[paramName][taskPos][taskAlt]
+					decoupledSolution.resolutionTree[paramName].Tasks[taskPos].Solution = placeholder[paramName][taskPos][taskAlt]
 				}
 			}
 		}
@@ -344,32 +344,17 @@ func (s Solution) decouple() []Solution {
 
 // MarshalJSON converts the solution to a JSON.
 func (s Solution) MarshalJSON() ([]byte, error) {
-	j, err := json.Marshal(struct {
-		Debug       bool
-		Resolved    bool
-		Size        int
-		Tree        map[string]Param
-		Action      string
-		Provider    Provider
-		Provisioner Provisioner
-		Resource    Resource
-		System      System
-	}{
-		Debug:       s.debug,
-		Resolved:    s.resolved,
-		Size:        s.size,
-		Tree:        s.resolutionTree,
-		Action:      s.action,
-		Provider:    s.Provider,
-		Provisioner: s.Provisioner,
-		Resource:    s.Resource,
-		System:      s.System,
+	return json.Marshal(map[string]interface{}{
+		"debug":           s.debug,
+		"resolved":        s.resolved,
+		"size":            s.size,
+		"resolution_tree": s.resolutionTree,
+		"action":          s.action,
+		"provider":        s.Provider,
+		"provisioner":     s.Provisioner,
+		"resource":        s.Resource,
+		"system":          s.System,
 	})
-	if err != nil {
-		return nil, err
-	}
-
-	return j, nil
 }
 
 // ToJSON converts the solution to a JSON string.

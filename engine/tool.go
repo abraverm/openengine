@@ -14,9 +14,9 @@ type ToolAPI map[string]Tool
 
 // A Tool is a shell script that only requires parameters for proper execution.
 type Tool struct {
-	Name       string
-	Parameters map[string]interface{}
-	Script     string
+	Name       string                 `json:"name"`
+	Parameters map[string]interface{} `json:"parameters"`
+	Script     string                 `json:"script"`
 }
 
 // Run tool script with given parameters.
