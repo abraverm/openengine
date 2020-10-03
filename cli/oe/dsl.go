@@ -1,5 +1,5 @@
 // Package common contains shared functions, types and const used by oe commands
-package common
+package main
 
 import (
 	"context"
@@ -42,7 +42,11 @@ func getSource(uri string) ([]byte, error) {
 
 	switch {
 	case urlParsed != nil:
-		res, err := http.NewRequestWithContext(context.Background(), http.MethodGet, uri, nil)
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, uri, nil)
+
+		client := http.Client{}
+
+		res, err := client.Do(req)
 		if err != nil {
 			return nil, fmt.Errorf("unable to download %w", err)
 		}
@@ -53,10 +57,8 @@ func getSource(uri string) ([]byte, error) {
 			}
 		}()
 
-		data, err = ioutil.ReadAll(res.Body)
-		if err != nil {
-			return nil, err
-		}
+		data, _ = ioutil.ReadAll(res.Body)
+
 	case fileExists(uri):
 		data, err := ioutil.ReadFile(filepath.Clean(uri))
 		if err != nil {
