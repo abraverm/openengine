@@ -37,7 +37,7 @@ func (c *ctrl) mockHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(resp)
 }
 
-func HttpMock(pattern string, statusCode int, response interface{}) *httptest.Server {
+func HTTPMock(pattern string, statusCode int, response interface{}) *httptest.Server {
 	c := &ctrl{statusCode, response}
 
 	handler := http.NewServeMux()
@@ -66,7 +66,7 @@ func Test_fileExists(t *testing.T) {
 }
 
 func Test_getSource(t *testing.T) {
-	srv := HttpMock("/empty", http.StatusOK, "")
+	srv := HTTPMock("/empty", http.StatusOK, "")
 	defer srv.Close()
 	tests := []struct {
 		name    string
