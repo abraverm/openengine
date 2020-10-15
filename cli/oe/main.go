@@ -129,7 +129,7 @@ func run(args []string) error {
 			Before: altsrc.InitInputSourceWithContext(flags, altsrc.NewYamlSourceFromFlagFunc("config")),
 			Action: func(c *cli.Context) error {
 				if c.NArg() == 0 {
-					return xerrors.Errorf("no DSL file was provider (argument)")
+					return xerrors.Errorf("no DSL file was provided (argument)")
 				}
 				initLogger(c.String("log"), c.Bool("debug"), c.Bool("verbose"))
 
