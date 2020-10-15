@@ -7,13 +7,15 @@ simple:
         resource_group_type: openstack
         resource_definitions:
           - name: {{ .name }}
+            count: 1
             role: os_server
             flavor: {{ .flavorRef }}
             image: {{ .imageRef }}
             keypair: {{ .key_name }}
-            networks: {{ .networks }}
+            networks: 
+            - {{ .networks }}
 EOF
-# linchpin up --env-vars linchpin_mock True
-cat PinFile
+linchpin -vvv up --env-vars linchpin_mock True
+#cat PinFile
 rm -rf PinFile
-echo "Server {{ .name }} was created"
+#echo "Server {{ .name }} was created"
