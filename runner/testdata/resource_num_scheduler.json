@@ -1,0 +1,328 @@
+[
+  {
+    "description": "Solution size testing",
+    "subject": "solutionSize",
+    "type": "method",
+    "tests": [
+      {
+        "description": "empty",
+        "function": "solutionSize",
+        "args": [
+          {
+            "type": "Solution",
+            "uri": "testdata/solution.empty.json"
+          }
+        ],
+        "want": [
+          {
+            "type": "native",
+            "value": 1
+          }
+        ]
+      },
+      {
+        "description": "implicit",
+        "function": "solutionSize",
+        "args": [
+          {
+            "type": "Solution",
+            "uri": "testdata/solution.implicit.json"
+          }
+        ],
+        "want": [
+          {
+            "type": "native",
+            "value": 2
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "Empty ResourceNumScheduler",
+    "subject": {},
+    "type": "type",
+    "tests": [
+      {
+        "description": "Number of solutions",
+        "function": "Len",
+        "args": [],
+        "want": [
+          {
+            "type": "native",
+            "value": 0
+          }
+        ]
+      },
+      {
+        "description": "Schedule solutions by size",
+        "function": "Schedule",
+        "args": [
+          {
+            "type": "Resource",
+            "value": {}
+          },
+          {
+            "type": "native",
+            "value": ""
+          }],
+        "want": [
+          {
+            "type": "Schedule",
+            "value": {}
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "ResourceNumScheduler with one empty solution",
+    "subject": {
+      "solutions": [{}]
+    },
+    "type": "type",
+    "tests": [
+      {
+        "description": "Number of solutions",
+        "function": "Len",
+        "args": [],
+        "want": [
+          {
+            "type": "native",
+            "value": 1
+          }
+        ]
+      },
+      {
+        "description": "Schedule solutions by size",
+        "function": "Schedule",
+        "args": [
+          {
+            "type": "Resource",
+            "value": {}
+          },
+          {
+            "type": "native",
+            "value": "something"
+          }],
+        "want": [
+          {
+            "type": "Schedule",
+            "value": {}
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "ResourceNumScheduler with two empty solutions",
+    "subject": {
+      "solutions": [{}, {}]
+    },
+    "type": "type",
+    "tests": [
+      {
+        "description": "Number of solutions",
+        "function": "Len",
+        "args": [],
+        "want": [
+          {
+            "type": "native",
+            "value": 2
+          }
+        ]
+      },
+      {
+        "description": "Compare solutions",
+        "function": "Less",
+        "args": [
+          {
+            "type": "int",
+            "value": 0
+          },
+          {
+            "type": "int",
+            "value": 1
+          }
+        ],
+        "want": [
+          {
+            "type": "native",
+            "value": false
+          }
+        ]
+      },
+      {
+        "description": "Swap solutions",
+        "function": "Swap",
+        "args": [
+          {
+            "type": "int",
+            "value": 0
+          },
+          {
+            "type": "int",
+            "value": 1
+          }
+        ],
+        "want": [
+          {
+            "type": "native",
+            "value": false
+          }
+        ]
+      },
+      {
+        "description": "Schedule solutions by size",
+        "function": "Schedule",
+        "args": [
+          {
+            "type": "Resource",
+            "value": {}
+          },
+          {
+            "type": "native",
+            "value": "something"
+          }],
+        "want": [
+          {
+            "type": "Schedule",
+            "value": {
+              "solutions": []
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "ResourceNumScheduler with two empty solutions",
+    "subject": {
+      "solutions": [{}, {}]
+    },
+    "type": "type",
+    "tests": [
+      {
+        "description": "Number of solutions",
+        "function": "Len",
+        "args": [],
+        "want": [
+          {
+            "type": "native",
+            "value": 2
+          }
+        ]
+      },
+      {
+        "description": "Compare solutions",
+        "function": "Less",
+        "args": [
+          {
+            "type": "int",
+            "value": 0
+          },
+          {
+            "type": "int",
+            "value": 1
+          }
+        ],
+        "want": [
+          {
+            "type": "native",
+            "value": false
+          }
+        ]
+      },
+      {
+        "description": "Swap solutions",
+        "function": "Swap",
+        "args": [
+          {
+            "type": "int",
+            "value": 0
+          },
+          {
+            "type": "int",
+            "value": 1
+          }
+        ],
+        "want": [
+          {
+            "type": "native",
+            "value": false
+          }
+        ]
+      },
+      {
+        "description": "Schedule solutions by size",
+        "function": "Schedule",
+        "args": [
+          {
+            "type": "Resource",
+            "value": {}
+          },
+          {
+            "type": "native",
+            "value": "something"
+          }],
+        "want": [
+          {
+            "type": "Schedule",
+            "value": {
+              "solutions": []
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "description": "ResourceNumScheduler with a one solution to match resource",
+    "subject": {
+      "solutions": [
+        {
+          "action": "create",
+          "resource": {
+            "resource": "Server",
+            "args": {}
+          }
+        }
+      ]
+    },
+    "type": "type",
+    "tests": [
+      {
+        "description": "Schedule solutions by size",
+        "function": "Schedule",
+        "args": [
+          {
+            "type": "Resource",
+            "value": {
+              "resource": "Server",
+              "args": {}
+            }
+          },
+          {
+            "type": "native",
+            "value": "create"
+          }],
+        "want": [
+          {
+            "type": "Schedule",
+            "value": {
+              "solutions": [
+                {
+                  "action": "create",
+                  "resource": {
+                    "resource": "Server",
+                    "args": {}
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

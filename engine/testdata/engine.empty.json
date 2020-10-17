@@ -179,25 +179,6 @@
         ]
       },
       {
-        "description": "Run",
-        "action": "Run",
-        "args": [],
-        "want": [
-          [],
-          null
-        ]
-      },
-      {
-        "description": "Find valid solutions and order by size (none)",
-        "action": "Schedule",
-        "args": [
-          "create"
-        ],
-        "want": [
-          null
-        ]
-      },
-      {
         "description": "Get engine solutions",
         "action": "GetSolutions",
         "args": [],
@@ -269,7 +250,6 @@
               "args": null,
               "Name": ""
             },
-            "size": 0,
             "system": null
           }
         ]

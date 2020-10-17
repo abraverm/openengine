@@ -18,10 +18,14 @@ type Resource struct {
 	Args map[string]interface{} `json:"args"`
 }
 
-// Schedule is a collection of solutions for a specific resource.
-type Schedule struct {
-	resource  Resource
-	solutions []Solution
+// ToolAPI is a list of tools.
+type ToolAPI map[string]Tool
+
+// A Tool is a shell script that only requires parameters for proper execution.
+type Tool struct {
+	Name       string                 `json:"name"`
+	Parameters map[string]interface{} `json:"parameters"`
+	Script     string                 `json:"script"`
 }
 
 func (r Resource) getImplicitKeys() []string {

@@ -5,8 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"reflect"
-	"sort"
 
 	"github.com/qri-io/jsonschema"
 	"golang.org/x/xerrors"
@@ -14,13 +12,12 @@ import (
 
 // An Engine is the OpenEngine interface - all actions should be done using it.
 type Engine struct {
-	Systems       []System      `json:"systems"`
-	Resources     []Resource    `json:"resources"`
-	Providers     []Provider    `json:"providers"`
-	Provisioners  []Provisioner `json:"provisioners"`
-	Solutions     []Solution    `json:"solutions"`
-	Tools         []Tool        `json:"tools"`
-	ScheduleOrder []Schedule    `json:"schedule_order"`
+	Systems      []System      `json:"systems"`
+	Resources    []Resource    `json:"resources"`
+	Providers    []Provider    `json:"providers"`
+	Provisioners []Provisioner `json:"provisioners"`
+	Solutions    []Solution    `json:"solutions"`
+	Tools        []Tool        `json:"tools"`
 }
 
 // NewEngine creates a new engine instance.
@@ -142,7 +139,7 @@ func (e Engine) matchProvidersProvisioners(resource Resource, system System) ([]
 					Provisioner: provisioner,
 					debug:       provider.Debug || provisioner.Debug,
 					Output:      errors,
-					action:      provider.Action,
+					Action:      provider.Action,
 				})
 
 				continue
@@ -154,7 +151,7 @@ func (e Engine) matchProvidersProvisioners(resource Resource, system System) ([]
 					Provisioner: provisioner,
 					debug:       provider.Debug || provisioner.Debug,
 					Output:      errors,
-					action:      provider.Action,
+					Action:      provider.Action,
 				})
 			}
 		}
@@ -176,7 +173,12 @@ func (e *Engine) Resolve() {
 		}
 	}
 
-	e.Solutions = solutions
+	decoupled := make([]Solution, 0, len(solutions))
+	for _, solution := range solutions {
+		decoupled = append(decoupled, solution.decouple()...)
+	}
+
+	e.Solutions = decoupled
 }
 
 // nolint: funlen, nestif
@@ -190,7 +192,7 @@ func (e *Engine) Resolve() {
 */
 func (e Engine) resolveDependencies(solution Solution) Solution {
 	solutionResolved := true
-	solution.resolutionTree = make(map[string]Param)
+	solution.ResolutionTree = make(map[string]Param)
 	// resolveExplicit populates resolutionTree with explicit params and returns implicit params to be handled here
 	for _, param := range solution.resolveExplicit() {
 		var tasks []Task
@@ -205,9 +207,10 @@ func (e Engine) resolveDependencies(solution Solution) Solution {
 					resolved = false
 				} else {
 					tasks = append(tasks, Task{
-						TaskType: "tool",
-						Resolved: true,
-						Tool:     tool,
+						TaskType:     "tool",
+						Resolved:     true,
+						Tool:         tool,
+						ImplicitTask: task,
 					})
 				}
 			} else {
@@ -237,11 +240,12 @@ func (e Engine) resolveDependencies(solution Solution) Solution {
 					TaskType:     "resource",
 					Resolved:     taskResolved,
 					Alternatives: alternatives,
+					ImplicitTask: task,
 				})
 			}
 		}
 
-		solution.resolutionTree[param] = Param{
+		solution.ResolutionTree[param] = Param{
 			ParamType: "implicit",
 			Resolved:  resolved,
 			Tasks:     tasks,
@@ -262,71 +266,6 @@ func (e Engine) getTool(task ImplicitTask) (Tool, error) {
 	}
 
 	return Tool{}, xerrors.Errorf("tool %v not found", task.Name)
-}
-
-// Schedule will find solutions that can fulfil the request and order them by size.
-// Size of a solution is number of its dependent solutions.
-func (e *Engine) Schedule(action string) error {
-	for _, resource := range e.Resources {
-		var solutions []Solution
-
-		for _, solution := range e.Solutions {
-			if reflect.DeepEqual(resource, solution.Resource) && solution.action == action {
-				solutions = append(solutions, solution)
-			}
-		}
-
-		if len(solutions) == 0 {
-			rJSON, _ := json.MarshalIndent(resource, "", "  ")
-
-			return xerrors.Errorf("no solution found for resource:\n%v", string(rJSON))
-		}
-
-		var decoupled []Solution
-		for _, solution := range solutions {
-			decoupled = append(decoupled, solution.decouple()...)
-		}
-
-		sort.Sort(solutionList(decoupled))
-
-		e.ScheduleOrder = append(e.ScheduleOrder, Schedule{
-			resource:  resource,
-			solutions: decoupled,
-		})
-	}
-
-	return nil
-}
-
-// Run try to execute scheduled solutions and tries the alternatives when needed.
-func (e Engine) Run() ([]string, error) {
-	var (
-		results []string
-		errors  []string
-	)
-
-	failed := false
-OUTER:
-	for _, schedule := range e.ScheduleOrder {
-		for _, solution := range schedule.solutions {
-			if result, err := solution.Run(map[string]interface{}{}); err == nil {
-				results = append(results, result)
-
-				continue OUTER
-			} else {
-				errors = append(errors, fmt.Sprint(err))
-			}
-		}
-		failed = true
-
-		break
-	}
-
-	if failed {
-		return nil, xerrors.Errorf("failed to provision Resource:\n%+v\nresults:\n%v", errors, results)
-	}
-
-	return results, nil
 }
 
 // GetSolutions returns engine current solutions.

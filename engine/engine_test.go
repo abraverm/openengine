@@ -217,13 +217,12 @@ func TestNewEngine(t *testing.T) {
 		{
 			name: "empty",
 			want: &Engine{
-				Systems:       nil,
-				Resources:     nil,
-				Providers:     nil,
-				Provisioners:  nil,
-				Solutions:     nil,
-				Tools:         nil,
-				ScheduleOrder: nil,
+				Systems:      nil,
+				Resources:    nil,
+				Providers:    nil,
+				Provisioners: nil,
+				Solutions:    nil,
+				Tools:        nil,
 			},
 		},
 	}

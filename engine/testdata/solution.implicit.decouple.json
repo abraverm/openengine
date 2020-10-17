@@ -241,7 +241,6 @@
               "Name": "",
               "args": null
             },
-            "size": 0,
             "system": null
           },
           "task_type": "tool",
@@ -287,7 +286,6 @@
               "Name": "",
               "args": null
             },
-            "size": 0,
             "system": null
           },
           "task_type": "tool",
@@ -400,7 +398,6 @@
                   "minRam": "$_memory"
                 }
               },
-              "size": 0,
               "system": {
                 "providerType": "Openstack"
               }
@@ -501,7 +498,6 @@
                 "minRam": "$_memory"
               }
             },
-            "size": 0,
             "system": {
               "providerType": "Openstack"
             }
@@ -542,7 +538,6 @@
               "Name": "",
               "args": null
             },
-            "size": 0,
             "system": null
           },
           "task_type": "tool",
@@ -585,7 +580,6 @@
               "Name": "",
               "args": null
             },
-            "size": 0,
             "system": null
           },
           "task_type": "tool",
@@ -647,7 +641,6 @@
               "Name": "",
               "args": null
             },
-            "size": 0,
             "system": null
           },
           "task_type": "tool",
@@ -680,7 +673,6 @@
       "networks": "ccit-net"
     }
   },
-  "size": 0,
   "system": {
     "providerType": "Openstack"
   }
