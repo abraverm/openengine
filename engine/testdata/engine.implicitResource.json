@@ -442,7 +442,27 @@
                   "task_type": "tool",
                   "resolved": true,
                   "alternatives": null,
+                  "implicit_task": {
+                    "action": "",
+                    "args": {
+                      "from": "$_memory",
+                      "to": "MiB"
+                    },
+                    "resource": "SizeConverter",
+                    "store": "$_memory",
+                    "type": "tool"
+                  },
                   "tool": {
+                    "implicit_task": {
+                      "action": "",
+                      "args": {
+                        "from": "$_disk",
+                        "to": "GiB"
+                      },
+                      "resource": "SizeConverter",
+                      "store": "$_disk",
+                      "type": "tool"
+                    },
                     "name": "SizeConverter",
                     "parameters": {
                       "from": {
@@ -480,7 +500,6 @@
                       "Name": "",
                       "args": null
                     },
-                    "size": 0,
                     "system": null
                   }
                 },
@@ -488,6 +507,16 @@
                   "task_type": "tool",
                   "resolved": true,
                   "alternatives": null,
+                  "implicit_task": {
+                    "action": "",
+                    "args": {
+                      "from": "$_disk",
+                      "to": "GiB"
+                    },
+                    "resource": "SizeConverter",
+                    "store": "$_disk",
+                    "type": "tool"
+                  },
                   "tool": {
                     "name": "SizeConverter",
                     "parameters": {
@@ -526,13 +555,22 @@
                       "Name": "",
                       "args": null
                     },
-                    "size": 0,
                     "system": null
                   }
                 },
                 {
                   "task_type": "resource",
                   "resolved": true,
+                  "implicit_task": {
+                    "action": "get",
+                    "args": {
+                      "minDisk": "$_disk",
+                      "minRam": "$_memory"
+                    },
+                    "resource": "Flavor",
+                    "store": "$_flavors",
+                    "type": "resource"
+                  },
                   "alternatives": [
                     {
                       "action": "get",
@@ -628,7 +666,6 @@
                           "minRam": "$_memory"
                         }
                       },
-                      "size": 0,
                       "system": {
                         "providerType": "Openstack"
                       }
@@ -640,39 +677,117 @@
                     "script": ""
                   },
                   "solution": {
-                    "action": "",
+                    "action": "get",
                     "debug": false,
                     "provider": {
-                      "match": null,
+                      "action": "get",
+                      "debug": false,
                       "implicit": null,
-                      "resource": "",
-                      "action": "",
-                      "parameters": null,
-                      "debug": false
+                      "match": {
+                        "properties": {
+                          "providerType": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "parameters": {
+                        "is_public": {
+                          "required": false,
+                          "explicit": {
+                            "$id": "is_public",
+                            "type": "boolean"
+                          },
+                          "implicit": null
+                        },
+                        "minDisk": {
+                          "required": false,
+                          "explicit": {
+                            "$id": "minDisk",
+                            "type": "string"
+                          },
+                          "implicit": null
+                        },
+                        "minRam": {
+                          "required": false,
+                          "explicit": {
+                            "$id": "minRam",
+                            "type": "string"
+                          },
+                          "implicit": null
+                        }
+                      },
+                      "resource": "Flavor"
                     },
                     "provisioner": {
-                      "resource": "",
-                      "parameters": null,
-                      "match": null,
-                      "action": "",
-                      "logic": "",
+                      "action": "get",
                       "debug": false,
-                      "required": null
+                      "logic": "openstack_mock_flavor.tmpl",
+                      "match": {
+                        "properties": {
+                          "providerType": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "parameters": {
+                        "is_public": {
+                          "type": "boolean"
+                        },
+                        "minDisk": {
+                          "type": "string"
+                        },
+                        "minRam": {
+                          "type": "string"
+                        }
+                      },
+                      "required": null,
+                      "resource": "Flavor"
                     },
-                    "resolution_tree": null,
-                    "resolved": false,
+                    "resolution_tree": {
+                      "is_public": {
+                        "resolved": true,
+                        "tasks": null,
+                        "param_type": "implicit"
+                      },
+                      "minDisk": {
+                        "resolved": true,
+                        "tasks": null,
+                        "param_type": "explicit"
+                      },
+                      "minRam": {
+                        "resolved": true,
+                        "tasks": null,
+                        "param_type": "explicit"
+                      }
+                    },
+                    "resolved": true,
                     "resource": {
-                      "Name": "",
-                      "args": null
+                      "Name": "Flavor",
+                      "args": {
+                        "minDisk": "$_disk",
+                        "minRam": "$_memory"
+                      }
                     },
-                    "size": 0,
-                    "system": null
+                    "system": {
+                      "providerType": "Openstack"
+                    }
                   }
                 },
                 {
                   "task_type": "tool",
                   "resolved": true,
                   "alternatives": null,
+                  "implicit_task": {
+                    "action": "",
+                    "args": {
+                      "data": "$_flavors"
+                    },
+                    "resource": "JsonFirst",
+                    "store": "$_flavor",
+                    "type": "tool"
+                  },
                   "tool": {
                     "name": "JsonFirst",
                     "parameters": {
@@ -708,7 +823,6 @@
                       "Name": "",
                       "args": null
                     },
-                    "size": 0,
                     "system": null
                   }
                 },
@@ -716,6 +830,16 @@
                   "task_type": "tool",
                   "resolved": true,
                   "alternatives": null,
+                  "implicit_task": {
+                    "action": "",
+                    "args": {
+                      "data": "$_flavor",
+                      "path": ".name"
+                    },
+                    "resource": "JsonPath",
+                    "store": "flavorRef",
+                    "type": "tool"
+                  },
                   "tool": {
                     "name": "JsonPath",
                     "parameters": {
@@ -754,7 +878,6 @@
                       "Name": "",
                       "args": null
                     },
-                    "size": 0,
                     "system": null
                   }
                 }
@@ -778,6 +901,15 @@
                   "task_type": "tool",
                   "resolved": true,
                   "alternatives": null,
+                  "implicit_task": {
+                    "action": "create",
+                    "args": {
+                      "random": true
+                    },
+                    "resource": "NameGenerator",
+                    "store": "name",
+                    "type": "tool"
+                  },
                   "tool": {
                     "name": "NameGenerator",
                     "parameters": {
@@ -813,7 +945,6 @@
                       "Name": "",
                       "args": null
                     },
-                    "size": 0,
                     "system": null
                   }
                 }
@@ -837,7 +968,6 @@
               "networks": "ccit-net"
             }
           },
-          "size": 0,
           "system": {
             "providerType": "Openstack"
           }
@@ -917,8 +1047,7 @@
           },
           "script": "name_generator.sh"
         }
-      ],
-      "schedule_order": null
+      ]
     },
     "tests": [
       {
@@ -1082,25 +1211,6 @@
         ]
       },
       {
-        "description": "Run",
-        "action": "Run",
-        "args": [],
-        "want": [
-          [],
-          null
-        ]
-      },
-      {
-        "description": "Find valid solutions and order by size (none)",
-        "action": "Schedule",
-        "args": [
-          "create"
-        ],
-        "want": [
-          null
-        ]
-      },
-      {
         "description": "Get engine solutions",
         "action": "GetSolutions",
         "args": [],
@@ -1172,7 +1282,6 @@
               "args": null,
               "Name": ""
             },
-            "size": 0,
             "system": null
           },
           {
@@ -1206,7 +1315,6 @@
                   "args": null,
                   "Name": ""
                 },
-                "size": 0,
                 "system": null
               }
             ]

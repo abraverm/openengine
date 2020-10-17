@@ -2,13 +2,7 @@ package engine
 
 import (
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"os"
-	"os/exec"
 	"reflect"
-	"regexp"
-	"text/template"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -17,16 +11,15 @@ import (
 // nolint: maligned
 // TODO: Fix order.
 type Solution struct {
-	Resource       Resource
-	System         System
-	Provider       Provider
-	Provisioner    Provisioner
+	Resource       Resource    `json:"resource"`
+	System         System      `json:"system"`
+	Provider       Provider    `json:"provider"`
+	Provisioner    Provisioner `json:"provisioner"`
 	resolved       bool
-	resolutionTree map[string]Param
+	ResolutionTree map[string]Param `json:"resolution_tree"`
 	parent         *Solution
-	size           int
-	action         string
-	Output         string
+	Action         string `json:"action"`
+	Output         string `json:"output"`
 	debug          bool
 }
 
@@ -39,25 +32,12 @@ type Param struct {
 
 // A Task is a resolution tree metadata about a solution parameter task used in the resolving process.
 type Task struct {
-	TaskType     string     `json:"task_type"`
-	Resolved     bool       `json:"resolved"`
-	Alternatives []Solution `json:"alternatives"`
-	Tool         Tool       `json:"tool"`
-	Solution     Solution   `json:"solution"`
-}
-
-type solutionList []Solution
-
-func (s solutionList) Len() int {
-	return len(s)
-}
-
-func (s solutionList) Less(i, j int) bool {
-	return s[i].size > s[j].size
-}
-
-func (s solutionList) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
+	TaskType     string       `json:"task_type"`
+	Resolved     bool         `json:"resolved"`
+	Alternatives []Solution   `json:"alternatives"`
+	Tool         Tool         `json:"tool"`
+	Solution     Solution     `json:"solution"`
+	ImplicitTask ImplicitTask `json:"implicit_task"`
 }
 
 func (s Solution) equals(solution Solution) bool {
@@ -107,7 +87,7 @@ func (s *Solution) resolveExplicit() []string {
 
 	for param := range s.Provider.Parameters {
 		if _, ok := s.Resource.Args[param]; ok { // Explicit
-			s.resolutionTree[param] = Param{
+			s.ResolutionTree[param] = Param{
 				ParamType: "explicit",
 				Resolved:  true,
 				Tasks:     nil,
@@ -123,84 +103,6 @@ func (s *Solution) resolveExplicit() []string {
 	}
 
 	return implicit
-}
-
-// Run solution will resolve implicit arguments and execute solution script
-// nolint: funlen, gocognit, nestif
-// TODO: function is too long and complicatd.
-func (s Solution) Run(solutionArgs map[string]interface{}) (string, error) {
-	args := make(map[string]interface{})
-	re := regexp.MustCompile(`\$_[[:alpha:]]*`)
-
-	if s.Resource.Args == nil {
-		s.Resource.Args = args
-	}
-
-	for k, v := range solutionArgs {
-		s.Resource.Args[k] = v
-	}
-
-	for key, def := range s.resolutionTree {
-		if def.ParamType == "explicit" {
-			args[key] = s.Resource.Args[key]
-		} else {
-			taskResults := s.Resource.Args
-			for i, task := range def.Tasks {
-				var store string
-				implicitTask := s.Provider.Parameters[key].Implicit[i]
-				if re.MatchString(implicitTask.Store) {
-					store = implicitTask.Store[1:]
-				} else {
-					store = implicitTask.Store
-				}
-				if task.TaskType == "tool" {
-					taskArgs := implicitTask.resolve(taskResults)
-					result, err := task.Tool.Run(taskArgs)
-					if err != nil {
-						return "", err
-					}
-					taskResults[store] = result
-				} else {
-					result, err := task.Solution.Run(taskResults)
-					if err != nil {
-						return "", err
-					}
-					taskResults[store] = result
-				}
-			}
-			args[key] = taskResults[key]
-		}
-	}
-
-	file, err := ioutil.TempFile("", "script.*.sh")
-	if err != nil {
-		return "", fmt.Errorf("solution run failed creating temp file: %w", err)
-	}
-
-	defer func() {
-		if removeError := os.Remove(file.Name()); removeError != nil {
-			err = fmt.Errorf("solution run failed to remove temp file: %w", removeError)
-		}
-	}()
-
-	tmpl, err := template.ParseFiles(s.Provisioner.Logic)
-	if err != nil {
-		sJSON, _ := json.MarshalIndent(s, "", "    ")
-
-		return "", fmt.Errorf("solution run failed to parse provisioner logic: %w\n%v", err, string(sJSON))
-	}
-
-	if err := tmpl.Execute(file, args); err != nil {
-		return "", fmt.Errorf("solution run failed to execut script: %w", err)
-	}
-
-	// nolint: gosec
-	out, err := exec.Command("/bin/sh", file.Name()).Output()
-	if err != nil {
-		return string(out), fmt.Errorf("solution run script failed: %w", err)
-	}
-
-	return string(out), nil
 }
 
 func makeRange(min, max int) []int {
@@ -276,7 +178,7 @@ func (s Solution) decouple() []Solution {
 
 	placeholder := make(map[string]map[int][]Solution)
 
-	for a, param := range s.resolutionTree { // recursion stop condition
+	for a, param := range s.ResolutionTree { // recursion stop condition
 		var (
 			tasksMap []int
 			tasks    [][]int
@@ -289,7 +191,7 @@ func (s Solution) decouple() []Solution {
 				for _, alt := range task.Alternatives {
 					for _, decoupledAlt := range alt.decouple() {
 						tmp := s
-						tmp.resolutionTree[a].Tasks[b].Solution = decoupledAlt
+						tmp.ResolutionTree[a].Tasks[b].Solution = decoupledAlt
 						placeholder[a][b] = append(placeholder[a][b], decoupledAlt)
 					}
 				}
@@ -326,7 +228,7 @@ func (s Solution) decouple() []Solution {
 			for _, taskComb := range combTasks {
 				for taskMapID, taskAlt := range taskComb { // 1, a
 					taskPos := paramTasksMap[paramID][taskMapID] // t1
-					decoupledSolution.resolutionTree[paramName].Tasks[taskPos].Solution = placeholder[paramName][taskPos][taskAlt]
+					decoupledSolution.ResolutionTree[paramName].Tasks[taskPos].Solution = placeholder[paramName][taskPos][taskAlt]
 				}
 			}
 		}
@@ -347,9 +249,8 @@ func (s Solution) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
 		"debug":           s.debug,
 		"resolved":        s.resolved,
-		"size":            s.size,
-		"resolution_tree": s.resolutionTree,
-		"action":          s.action,
+		"resolution_tree": s.ResolutionTree,
+		"action":          s.Action,
 		"provider":        s.Provider,
 		"provisioner":     s.Provisioner,
 		"resource":        s.Resource,
@@ -362,9 +263,8 @@ func (s Solution) ToJSON() string {
 	data := map[string]interface{}{
 		"debug":    s.debug,
 		"resolved": s.resolved,
-		"size":     s.size,
-		"tree":     s.resolutionTree,
-		"action":   s.action,
+		"tree":     s.ResolutionTree,
+		"action":   s.Action,
 	}
 
 	sJSON, err := json.MarshalIndent(data, "", "    ")

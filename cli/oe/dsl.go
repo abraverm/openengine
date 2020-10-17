@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 
 	"github.com/abraverm/openengine/engine"
+	"github.com/abraverm/openengine/runner"
 	"github.com/goccy/go-yaml"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/xerrors"
@@ -151,18 +152,17 @@ func (d *DSL) CreateEngine() {
 
 // Run ignites the engine and get it to run found solutions for give action.
 func (d DSL) Run(action string) error {
-	if err := d.Engine.Schedule(action); err != nil {
-		return err
+	scheduler := runner.ResourceNumScheduler{
+		Solutions: d.Engine.Solutions,
 	}
+	local := runner.NewLocalRunner(d.Engine, action, scheduler)
 
-	results, err := d.Engine.Run()
+	result, err := runner.Run(local)
 	if err != nil {
 		return err
 	}
 
-	for _, result := range results {
-		log.Debugln("\n", result)
-	}
+	log.Info(result)
 
 	return nil
 }

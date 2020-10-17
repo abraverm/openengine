@@ -44,9 +44,8 @@ func (s *Solution) UnmarshalJSON(b []byte) error {
 	}
 
 	s.resolved = temp.Resolved
-	s.resolutionTree = temp.ResolutionTree
-	s.size = temp.Size
-	s.action = temp.Action
+	s.ResolutionTree = temp.ResolutionTree
+	s.Action = temp.Action
 	s.debug = temp.Debug
 	s.parent = temp.Parent
 	s.System = temp.System
@@ -81,33 +80,6 @@ func TestSolution_MarshalJSON(t *testing.T) {
 			}
 			if result, diff := jsondiff.Compare(wantJson, got, &opt); result.String() != "FullMatch" {
 				t.Fatalf(diff)
-			}
-		})
-	}
-}
-
-func TestSolution_Run(t *testing.T) {
-	tests := []struct {
-		name    string
-		test    TestData
-		args    map[string]interface{}
-		want    string
-		wantErr bool
-	}{
-		{"empty", "solution.empty", map[string]interface{}{}, "", true},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			testJson, _ := tt.test.Reader()
-			testSolution := &Solution{}
-			json.Unmarshal(testJson, &testSolution)
-			got, err := testSolution.Run(tt.args)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Run() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got != tt.want {
-				t.Fatalf("Run() got %v but, wanted %v", got, tt.want)
 			}
 		})
 	}
@@ -425,99 +397,6 @@ func Test_makeRange(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := makeRange(tt.args.min, tt.args.max); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("makeRange() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_solutionList_Len(t *testing.T) {
-	tests := []struct {
-		name string
-		s    solutionList
-		want int
-	}{
-		{
-			name: "empty",
-			s:    solutionList{},
-			want: 0,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.s.Len(); got != tt.want {
-				t.Errorf("Len() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_solutionList_Less(t *testing.T) {
-	type args struct {
-		i int
-		j int
-	}
-	tests := []struct {
-		name string
-		s    solutionList
-		args args
-		want bool
-	}{
-		{
-			name: "equal",
-			s:    solutionList{Solution{size: 1}, Solution{size: 1}},
-			args: args{
-				i: 0,
-				j: 1,
-			},
-			want: false,
-		},
-		{
-			name: "bigger",
-			s:    solutionList{Solution{size: 2}, Solution{size: 1}},
-			args: args{
-				i: 0,
-				j: 1,
-			},
-			want: true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.s.Less(tt.args.i, tt.args.j); got != tt.want {
-				t.Errorf("Less() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_solutionList_Swap(t *testing.T) {
-	type args struct {
-		i int
-		j int
-	}
-	s1 := Solution{size: 1}
-	s2 := Solution{size: 2}
-	tests := []struct {
-		name string
-		s    solutionList
-		args args
-		want solutionList
-	}{
-		{
-			name: "simple",
-			s:    solutionList{s1, s2},
-			args: args{
-				i: 0,
-				j: 1,
-			},
-			want: solutionList{s2, s1},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tt.s.Swap(tt.args.i, tt.args.j)
-			if tt.s[0].size != 2 {
-				t.Errorf("Less() = %v, want %v", tt.s, tt.want)
 			}
 		})
 	}

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"regexp"
 	"sort"
-	"strings"
 )
 
 // ProviderAPI is a list of resource types and their matching providers.
@@ -45,26 +44,6 @@ type ImplicitTask struct {
 	Type   string                 `json:"type"`
 	Store  string                 `json:"store"`
 	Action string                 `json:"action"`
-}
-
-func (t ImplicitTask) resolve(values map[string]interface{}) map[string]interface{} {
-	args := make(map[string]interface{})
-
-	for paramName, paramValue := range t.Args {
-		result := fmt.Sprint(paramValue)
-		for resolvedParam, resolvedValue := range values {
-			result = strings.Replace(
-				result,
-				fmt.Sprintf("$%v", resolvedParam),
-				fmt.Sprint(resolvedValue),
-				-1,
-			)
-		}
-
-		args[paramName] = result
-	}
-
-	return args
 }
 
 func (t ImplicitTask) getImplicitKeys() []string {

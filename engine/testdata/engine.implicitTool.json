@@ -259,6 +259,15 @@
                   "task_type": "tool",
                   "resolved": true,
                   "alternatives": null,
+                  "implicit_task": {
+                   "resource": "NameGenerator",
+                   "args": {
+                     "random": true
+                   },
+                   "type": "tool",
+                   "store": "name",
+                   "action": "create"
+                 },
                   "tool": {
                     "name": "NameGenerator",
                     "parameters": {
@@ -294,7 +303,6 @@
                       "Name": "",
                       "args": null
                     },
-                    "size": 0,
                     "system": null
                   }
                 }
@@ -317,7 +325,6 @@
               "networks": "ccit-net"
             }
           },
-          "size": 0,
           "system": {
             "providerType": "Openstack"
           }
@@ -497,25 +504,6 @@
         ]
       },
       {
-        "description": "Run",
-        "action": "Run",
-        "args": [],
-        "want": [
-          [],
-          null
-        ]
-      },
-      {
-        "description": "Find valid solutions and order by size (none)",
-        "action": "Schedule",
-        "args": [
-          "create"
-        ],
-        "want": [
-          null
-        ]
-      },
-      {
         "description": "Get engine solutions",
         "action": "GetSolutions",
         "args": [],
@@ -587,7 +575,6 @@
               "args": null,
               "Name": ""
             },
-            "size": 0,
             "system": null
           }
         ]
