@@ -1,0 +1,21 @@
+cat << EOF > PinFile
+simple:
+  topology:
+    topology_name: simple
+    resource_groups:
+      - resource_group_name: new
+        resource_group_type: openstack
+        resource_definitions:
+          - name: {{ .name }}
+            count: 1
+            role: os_server
+            flavor: {{ .flavorRef }}
+            image: {{ .imageRef }}
+            keypair: {{ .key_name }}
+            networks: 
+            - {{ .networks }}
+EOF
+linchpin -vvv up --env-vars linchpin_mock True
+#cat PinFile
+rm -rf PinFile
+#echo "Server {{ .name }} was created"

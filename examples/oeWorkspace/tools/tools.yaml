@@ -1,0 +1,42 @@
+---
+SizeConverter:
+  parameters:
+    from:
+      type: string
+    to:
+      type: string
+  script: size_converter.sh
+JsonFirst:
+  parameters:
+    data:
+      type: string
+  script: json_first.sh
+JsonPath:
+  parameters:
+    data:
+      type: string
+    path:
+      type: string
+  script: json_path.sh
+JsonTransform:
+  parameters:
+    data:
+      type: string
+    template:
+      type: string
+  script: json_transform.sh
+JsonSort:
+  parameters:
+    data:
+      type: string
+    sortBy:
+      type: string
+    sortType:
+      type: string
+      enum: ["asc", "dec"]
+  script: json_sort.sh
+NameGenerator:
+  parameters:
+    random:
+      type: boolean
+  script: name_generator.sh

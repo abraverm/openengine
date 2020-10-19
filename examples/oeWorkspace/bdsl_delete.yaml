@@ -1,0 +1,18 @@
+---
+api:
+  - provider.yaml
+provisioners:
+  - provisioner_delete.yaml
+systems:
+  - providerType: Openstack
+tools:
+  - tools.yaml
+resources:
+# Explicit - All the arguments names are perfect fit for Openstack provider API
+  - resource: Server
+    args:
+      imageRef: Fedora-31
+      key_name: ccit
+      name: FullyExplicit
+      flavorRef: m2.large
+      networks: ccit-net
