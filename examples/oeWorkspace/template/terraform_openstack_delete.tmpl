@@ -1,21 +1,19 @@
-cat << EOF > PinFile
-simple:
-  topology:
-    topology_name: simple
-    resource_groups:
-      - resource_group_name: new
-        resource_group_type: openstack
-        resource_definitions:
-          - name: {{ .name }}
-            count: 1
-            role: os_server
-            flavor: {{ .flavorRef }}
-            image: {{ .imageRef }}
-            keypair: {{ .key_name }}
-            networks: 
-            - {{ .networks }}
+cat << EOF > terraformdelete.tf
+provider "openstack" {
+  user_name        = "{{.user_name}}"
+  tenant_name      = "{{.user_name}}"
+  password         = "{{.user_name}}"
+  auth_url         = "{{.user_name}}"
+  domain_name = "{{.user_name}}"
+}
+
+resource "openstack_compute_instance_v2" "delete" {
+    name = "InstanceDeleted"
+}
+
 EOF
-linchpin -vvv up --env-vars linchpin_mock True
-#cat PinFile
-rm -rf PinFile
-#echo "Server {{ .name }} was created"
+terraform init
+terraform import openstack_compute_instance_v2.delete {{.resource_id}}
+terraform destroy -auto-approve
+rm .terraform/ terraform.tfstate terraformdelete.tf -rf
+#echo "Server {{ .resource_id }} was created"
