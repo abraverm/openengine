@@ -11,5 +11,5 @@ ServerDelete:
           type: string
       required:
         - resource_id
-      logic: terraform_openstack_delete.tmpl
-      debug: false
+      logic: "template/terraform_openstack_delete.tmpl"
+      debug: true

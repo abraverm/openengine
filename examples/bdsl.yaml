@@ -3,21 +3,12 @@ api:
   - provider.yaml
 provisioners:
   - linchpin.yaml
-  - openstack_mock.yaml
+  # - openstack_mock.yaml
 systems:
   - providerType: Openstack
 tools:
   - tools.yaml
 resources:
-# Implicit - Resolves `name` and `flavorRef` (ignore imageRef and keyname)
-  - resource: Server
-    args:
-      _memory: 4GiB
-      _disk: 100GiB
-      imageRef: Fedora-31
-      key_name: ccit
-      networks: ccit-net
-# Explicit - All the arguments names are perfect fit for Openstack provider API
   - resource: Server
     args:
       imageRef: Fedora-31
@@ -25,17 +16,3 @@ resources:
       name: FullyExplicit
       flavorRef: m2.large
       networks: ccit-net
-# Semi-Implicit - Resolves only `name`
-  - resource: Server
-    args:
-      imageRef: Fedora-31
-      key_name: ccit
-      flavorRef: m2.large
-      networks: ccit-net
-# Network Implicit - Resolves `network` by looking for most available
-  - resource: Server
-    args:
-      imageRef: Fedora-31
-      key_name: ccit
-      name: NetworkImplicit
-      flavorRef: m2.large

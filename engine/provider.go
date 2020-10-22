@@ -93,12 +93,6 @@ func (p Provider) toJSONSchema() Schema {
 	// var required []string
 	properties := make(map[string]interface{})
 	argsSchema := make(Schema)
-	/*for param, def := range p.Parameters {
-		argsSchema[param] = def.toJSONSchema(p.Implicit, param)
-		if def.Required {
-			 required = append(required, param)
-		}
-	}*/
 	for param := range p.Parameters {
 		argsSchema[param] = Schema{"$ref": fmt.Sprintf("%v", param)}
 	}
