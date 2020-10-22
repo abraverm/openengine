@@ -128,7 +128,7 @@ func (s *Solution) resolveExplicit() []string {
 // Run solution will resolve implicit arguments and execute solution script
 // nolint: funlen, gocognit, nestif
 // TODO: function is too long and complicatd.
-func (s Solution) Run(solutionArgs map[string]interface{}) (string, error) {
+func (s *Solution) Run(solutionArgs map[string]interface{}) (string, error) {
 	args := make(map[string]interface{})
 	re := regexp.MustCompile(`\$_[[:alpha:]]*`)
 

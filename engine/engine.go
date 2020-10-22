@@ -40,10 +40,12 @@ func (e *Engine) AddResource(resource Resource) {
 
 // AddProvider will add a provider to the engine.
 func (e *Engine) AddProvider(api ProviderAPI) {
-	for resourceType, resource := range api {
-		for _, provider := range resource.Providers {
-			provider.Implicit = resource.Implicit
-			provider.Resource = resourceType
+	for key, val := range api {
+		// the key is resource type, e.x.: Server
+		// The val is the provider section(Resource in Engine.Provider) in provider.yaml
+		for _, provider := range val.Providers {
+			provider.Implicit = val.Implicit
+			provider.Resource = key
 			e.Providers = append(e.Providers, provider)
 		}
 	}

@@ -7,15 +7,7 @@ Server:
           providerType:
             type: string
       parameters:
-        name:
-          type: string
-        flavorRef:
-          type: string
-        imageRef:
-          type: string
-        key_name:
-          type: string
-        networks:
+        resource_id:
           type: string
       required:
         - name

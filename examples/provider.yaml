@@ -103,3 +103,39 @@ Server:
                 random: true
               store: name
       debug: false
+Flavor:
+  providers:
+    - action: get
+      match:
+        type: object
+        properties:
+          providerType:
+            type: string
+      parameters:
+        minDisk:
+          required: false
+          explicit:
+            type: string # TODO
+        minRam:
+          required: false
+          explicit:
+            type: string # TODO
+        is_public:
+          required: false
+          explicit:
+            type: boolean
+      debug: false
+NetworkIPAvailability:
+  providers:
+    - action: get
+      match:
+        type: object
+        properties:
+          providerType:
+            type: string
+      parameters:
+        network_id:
+          required: false
+          explicit:
+            type: string
+      debug: false

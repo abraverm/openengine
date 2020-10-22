@@ -74,6 +74,38 @@ func deploy(path string, noop bool) error {
 	return nil
 }
 
+func delete(path string, noop bool) error {
+	filename, _ := filepath.Abs(path)
+
+	yamlFile, err := ioutil.ReadFile(filepath.Clean(filename))
+	if err != nil {
+		return xerrors.Errorf("Unable to read DSL file:\n%v", err)
+	}
+
+	var dsl DSL
+
+	err = yaml.UnmarshalWithOptions(yamlFile, &dsl, yaml.Strict())
+	if err != nil {
+		return xerrors.Errorf("Unable to parse DSL file:\n%v", err.Error())
+	}
+
+	dsl.CreateEngine()
+
+	if noop {
+		engineJSON, _ := json.MarshalIndent(dsl.Engine, "", "  ")
+
+		fmt.Println(string(engineJSON))
+
+		return nil
+	}
+
+	if err := dsl.Delete("delete"); err != nil {
+		return xerrors.Errorf("Engine failed to run:\n%v", err)
+	}
+
+	return nil
+}
+
 // nolint: funlen
 func run(args []string) error {
 	app := &cli.App{
@@ -134,6 +166,21 @@ func run(args []string) error {
 				initLogger(c.String("log"), c.Bool("debug"), c.Bool("verbose"))
 
 				return deploy(c.Args().Get(0), c.Bool("noop"))
+			},
+		},
+		{
+			Name:  "delete",
+			Usage: "Delete resources",
+			Description: "Delete command will parse the DSL file, " +
+				"resolve the APIs and other requirements to delete requested resources",
+			Before: altsrc.InitInputSourceWithContext(flags, altsrc.NewYamlSourceFromFlagFunc("config")),
+			Action: func(c *cli.Context) error {
+				if c.NArg() == 0 {
+					return xerrors.Errorf("no DSL file was provider (argument)")
+				}
+				initLogger(c.String("log"), c.Bool("debug"), c.Bool("verbose"))
+
+				return delete(c.Args().Get(0), c.Bool("noop"))
 			},
 		},
 	}

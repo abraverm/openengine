@@ -150,7 +150,25 @@ func (d *DSL) CreateEngine() {
 }
 
 // Run ignites the engine and get it to run found solutions for give action.
-func (d DSL) Run(action string) error {
+func (d *DSL) Run(action string) error {
+	if err := d.Engine.Schedule(action); err != nil {
+		return err
+	}
+
+	results, err := d.Engine.Run()
+	if err != nil {
+		return err
+	}
+
+	for _, result := range results {
+		log.Debugln("\n", result)
+	}
+
+	return nil
+}
+
+// Delete will delete the resource
+func (d *DSL) Delete(action string) error {
 	if err := d.Engine.Schedule(action); err != nil {
 		return err
 	}
