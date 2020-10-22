@@ -1,20 +1,14 @@
 ---
 providers:
-  - provider.yaml
+  - provider_delete.yaml
 provisioners:
   - provisioner_delete.yaml
 systems:
-  - System1:
-      providerType: Openstack
+  providerType: Openstack
 tools:
   - tools.yaml
 resources:
   - resource: Server
-    systems: System1
+    system_name: Openstack
     args: 
-      imageRef: Fedora-31
-      key_name: ccit
-      name: FullyExplicit
-      flavorRef: m2.large
-      networks: ccit-net
       resource_id: "60cacaff-86a6-4f88-82a4-ed3023724df1"

@@ -74,19 +74,19 @@ func deploy(path string, noop bool) error {
 	return nil
 }
 
-func delete(path string, noop bool) error {
+func delete(path string, noop bool) (results []string, err error) {
 	filename, _ := filepath.Abs(path)
 
 	yamlFile, err := ioutil.ReadFile(filepath.Clean(filename))
 	if err != nil {
-		return xerrors.Errorf("Unable to read DSL file:\n%v", err)
+		return nil, xerrors.Errorf("Unable to read DSL file:\n%v", err)
 	}
 
 	var dsl DSL
 
 	err = yaml.UnmarshalWithOptions(yamlFile, &dsl, yaml.Strict())
 	if err != nil {
-		return xerrors.Errorf("Unable to parse DSL file:\n%v", err.Error())
+		return nil, xerrors.Errorf("Unable to parse DSL file:\n%v", err.Error())
 	}
 
 	dsl.CreateEngine()
@@ -96,14 +96,16 @@ func delete(path string, noop bool) error {
 
 		fmt.Println(string(engineJSON))
 
-		return nil
+		return nil, nil
 	}
 
-	if err := dsl.Delete("delete"); err != nil {
-		return xerrors.Errorf("Engine failed to run:\n%v", err)
+	if results, err := dsl.Delete("delete"); err != nil {
+		return nil, xerrors.Errorf("Engine failed to run:\n%v", err)
+	} else {
+		return results, nil
 	}
 
-	return nil
+	return results, nil
 }
 
 // nolint: funlen
@@ -179,8 +181,9 @@ func run(args []string) error {
 					return xerrors.Errorf("no DSL file was provider (argument)")
 				}
 				initLogger(c.String("log"), c.Bool("debug"), c.Bool("verbose"))
-
-				return delete(c.Args().Get(0), c.Bool("noop"))
+				results, err := delete(c.Args().Get(0), c.Bool("noop"))
+				fmt.Println("This is the result of deleting", results)
+				return err
 			},
 		},
 	}

@@ -14,8 +14,9 @@ type System map[string]interface{}
 
 // Resource is the user requested resource with its type and parameters.
 type Resource struct {
-	Name string                 `yaml:"resource"`
-	Args map[string]interface{} `json:"args"`
+	Name       string                 `yaml:"resource"`
+	Args       map[string]interface{} `json:"args"`
+	SystemName string                 `json:"system_name"`
 }
 
 // Schedule is a collection of solutions for a specific resource.

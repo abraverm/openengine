@@ -168,21 +168,21 @@ func (d *DSL) Run(action string) error {
 }
 
 // Delete will delete the resource
-func (d *DSL) Delete(action string) error {
+func (d *DSL) Delete(action string) ([]string, error) {
 	if err := d.Engine.Schedule(action); err != nil {
-		return err
+		return nil, err
 	}
 
 	results, err := d.Engine.Run()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	for _, result := range results {
 		log.Debugln("\n", result)
 	}
 
-	return nil
+	return results, nil
 }
 
 // GetSolutions wrapper function?

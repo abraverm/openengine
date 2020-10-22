@@ -1,6 +1,6 @@
 ---
-Server:
-  create:
+ServerDelete:
+  delete:
     - match:
         type: object
         properties:
@@ -10,9 +10,6 @@ Server:
         resource_id:
           type: string
       required:
-        - name
-        - flavorRef
-        - imageRef
-        - key_name
-      logic: linchpin_openstack_create.tmpl
+        - resource_id
+      logic: terraform_openstack_delete.tmpl
       debug: false

@@ -12,3 +12,4 @@ ServerDelete:
           required: true
           explicit:
             type: string
+      debug: false
