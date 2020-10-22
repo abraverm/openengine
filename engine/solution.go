@@ -85,6 +85,7 @@ func (s Solution) inLoop(solution Solution) bool {
 	return s.parent.inLoop(solution)
 }
 
+//TODO: Can be improved by using map
 func intersect(a []string, b []string) []string {
 	set := make([]string, 0)
 

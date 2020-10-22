@@ -105,7 +105,7 @@ func delete(path string, noop bool) (results []string, err error) {
 		return results, nil
 	}
 
-	return results, nil
+	// return results, nil
 }
 
 // nolint: funlen

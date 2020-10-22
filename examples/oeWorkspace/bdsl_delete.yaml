@@ -1,12 +1,12 @@
 ---
-providers:
-  - provider_delete.yaml
+api:
+  - "apis/provider_delete.yaml"
 provisioners:
-  - provisioner_delete.yaml
+  - "provisioners/provisioner_delete.yaml"
 systems:
-  providerType: Openstack
+  - providerType: Openstack
 tools:
-  - tools.yaml
+  - "tools/tools.yaml"
 resources:
   - resource: Server
     system_name: Openstack
