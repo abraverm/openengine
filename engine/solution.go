@@ -65,6 +65,7 @@ func (s Solution) inLoop(solution Solution) bool {
 	return s.parent.inLoop(solution)
 }
 
+//TODO: Can be improved by using map
 func intersect(a []string, b []string) []string {
 	set := make([]string, 0)
 
@@ -156,9 +157,9 @@ func combIntSlices(seq [][]int) (out [][]int) {
 			out = combSeq
 
 			return
-		} else {
-			rec(i+1, seq, combSeq) // if the length of seq is not reached, rec is called to perform another step of combinations
 		}
+		rec(i+1, seq, combSeq) // if the length of seq is not reached, rec is called to perform another step of combinations
+
 	}
 	rec(0, seq, combSeq) // start the first step of combinations
 

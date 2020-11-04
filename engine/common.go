@@ -9,13 +9,20 @@ import (
 // TODO: how about using jsonschema directly instead?
 type Schema map[string]interface{}
 
-// System is a provider instance that contains matching values and other metadata such as credentials.
+// System is a unit of the provider
+// e.x.:
+// systems:
+//   OpenStack:
+// Below is one System
+//	   providerType: Openstack
+//	   version: 0.13
 type System map[string]interface{}
 
 // Resource is the user requested resource with its type and parameters.
 type Resource struct {
-	Name string                 `yaml:"resource"`
-	Args map[string]interface{} `json:"args"`
+	Name       string                 `yaml:"resource"`
+	SystemName string                 `yaml:"system_name"`
+	Args       map[string]interface{} `json:"args"`
 }
 
 // ToolAPI is a list of tools.

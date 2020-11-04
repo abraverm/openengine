@@ -19,11 +19,11 @@ import (
 
 // DSL is the result of processing the ie dsl file and manages the engine operations.
 type DSL struct {
-	API          []string          `yaml:"api"`
-	Provisioners []string          `yaml:"provisioners"`
-	Systems      []engine.System   `yaml:"systems"`
-	Tools        []string          `yaml:"tools"`
-	Resources    []engine.Resource `yaml:"resources"`
+	API          []string                 `yaml:"api"`
+	Provisioners []string                 `yaml:"provisioners"`
+	Systems      map[string]engine.System `yaml:"systems"`
+	Tools        []string                 `yaml:"tools"`
+	Resources    []engine.Resource        `yaml:"resources"`
 	Engine       engine.Engine
 }
 
@@ -80,8 +80,18 @@ func getSource(uri string) ([]byte, error) {
 func (d *DSL) CreateEngine() {
 	e := engine.NewEngine()
 
-	for _, system := range d.Systems {
-		e.AddSystem(system)
+	for systemName, system := range d.Systems {
+		// Here the System is a map[string]map[string]interface{}
+		// map can be iterated with the Range
+		// each system look like below
+		// map[string]interface{}{
+		// "OpenStack": map[string]interface{}{
+		// "providerType": "Openstack",
+		// 	"version": "0.13",
+		// 		}
+		// 	}
+		// where
+		e.AddSystem(systemName, system)
 	}
 
 	for _, resource := range d.Resources {
@@ -150,8 +160,28 @@ func (d *DSL) CreateEngine() {
 	d.Engine = *e
 }
 
+// Delete will delete the resource
+func (d *DSL) Delete(action string) ([]string, error) {
+
+	scheduler := runner.ResourceNumScheduler{
+		Solutions: d.Engine.Solutions,
+	}
+	local := runner.NewLocalRunner(d.Engine, action, scheduler)
+
+	results, err := runner.Run(local)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, result := range results {
+		log.Debugln("\n", result)
+	}
+
+	return results, nil
+}
+
 // Run ignites the engine and get it to run found solutions for give action.
-func (d DSL) Run(action string) error {
+func (d *DSL) Run(action string) error {
 	scheduler := runner.ResourceNumScheduler{
 		Solutions: d.Engine.Solutions,
 	}

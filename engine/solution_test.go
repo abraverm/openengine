@@ -68,17 +68,17 @@ func TestSolution_MarshalJSON(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			testJson, _ := tt.test.Reader()
-			wantJson, _ := tt.want.Reader()
+			testJSON, _ := tt.test.Reader()
+			wantJSON, _ := tt.want.Reader()
 			testSolution := &Solution{}
-			json.Unmarshal(testJson, &testSolution)
+			json.Unmarshal(testJSON, &testSolution)
 			opt := jsondiff.DefaultConsoleOptions()
 			got, err := testSolution.MarshalJSON()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("MarshalJSON() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if result, diff := jsondiff.Compare(wantJson, got, &opt); result.String() != "FullMatch" {
+			if result, diff := jsondiff.Compare(wantJSON, got, &opt); result.String() != "FullMatch" {
 				t.Fatalf(diff)
 			}
 		})
@@ -95,18 +95,18 @@ func TestSolution_ToJson(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			inJson, err := tt.in.Reader()
+			inJSON, err := tt.in.Reader()
 			if err != nil {
 				t.Fatalf("%s", err)
 			}
-			outJson, err := tt.out.Reader()
+			outJSON, err := tt.out.Reader()
 			if err != nil {
 				t.Fatalf("%s", err)
 			}
 			inSolution := &Solution{}
-			json.Unmarshal(inJson, inSolution)
+			json.Unmarshal(inJSON, inSolution)
 			opt := jsondiff.DefaultConsoleOptions()
-			if result, diff := jsondiff.Compare([]byte(inSolution.ToJSON()), outJson, &opt); result.String() != "FullMatch" {
+			if result, diff := jsondiff.Compare([]byte(inSolution.ToJSON()), outJSON, &opt); result.String() != "FullMatch" {
 				t.Errorf("%v", diff)
 			}
 		})
@@ -132,9 +132,9 @@ func TestSolution_decouple(t *testing.T) {
 				json.Unmarshal(wantJSON, &wantSolution)
 				want = append(want, *wantSolution)
 			}
-			testJson, _ := tt.test.Reader()
+			testJSON, _ := tt.test.Reader()
 			testSolution := &Solution{}
-			json.Unmarshal(testJson, &testSolution)
+			json.Unmarshal(testJSON, &testSolution)
 			got := testSolution.decouple()
 			gJSON, _ := json.Marshal(got)
 			wJSON, _ := json.Marshal(want)
@@ -155,18 +155,18 @@ func TestSolution_equals(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			inJson, err := tt.testData.Reader()
+			inJSON, err := tt.testData.Reader()
 			if err != nil {
 				t.Fatalf("%s", err)
 			}
-			outJson, err := tt.want.Reader()
+			outJSON, err := tt.want.Reader()
 			if err != nil {
 				t.Fatalf("%s", err)
 			}
 			inSolution := &Solution{}
-			json.Unmarshal(inJson, inSolution)
+			json.Unmarshal(inJSON, inSolution)
 			outSolution := &Solution{}
-			json.Unmarshal(outJson, outSolution)
+			json.Unmarshal(outJSON, outSolution)
 			if !inSolution.equals(*outSolution) {
 				t.Errorf("Solution not equal")
 			}
@@ -185,18 +185,18 @@ func TestSolution_inLoop(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			testJson, err := tt.testCase.Reader()
+			testJSON, err := tt.testCase.Reader()
 			if err != nil {
 				t.Fatalf("%s", err)
 			}
-			argJson, err := tt.arg.Reader()
+			argJSON, err := tt.arg.Reader()
 			if err != nil {
 				t.Fatalf("%s", err)
 			}
 			testSolution := &Solution{}
-			json.Unmarshal(testJson, testSolution)
+			json.Unmarshal(testJSON, testSolution)
 			argSolution := &Solution{}
-			json.Unmarshal(argJson, argSolution)
+			json.Unmarshal(argJSON, argSolution)
 			if testSolution.inLoop(*argSolution) != tt.want {
 				result := "'nt"
 				if tt.want {
@@ -220,10 +220,10 @@ func TestSolution_resolveExplicit(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			testJson, _ := tt.test.Reader()
-			newJson, _ := tt.new.Reader()
+			testJSON, _ := tt.test.Reader()
+			newJSON, _ := tt.new.Reader()
 			testSolution := &Solution{}
-			err := json.Unmarshal(testJson, &testSolution)
+			err := json.Unmarshal(testJSON, &testSolution)
 			if err != nil {
 				t.Fatalf("%v", err)
 			}
@@ -232,7 +232,7 @@ func TestSolution_resolveExplicit(t *testing.T) {
 			sort.Strings(got)
 			sort.Strings(tt.want)
 			newnew, _ := json.Marshal(testSolution)
-			if result, diff := jsondiff.Compare(newJson, newnew, &opt); result.String() != "FullMatch" {
+			if result, diff := jsondiff.Compare(newJSON, newnew, &opt); result.String() != "FullMatch" {
 				t.Fatalf(diff)
 			}
 			if !reflect.DeepEqual(got, tt.want) {

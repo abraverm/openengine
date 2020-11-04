@@ -12,12 +12,12 @@ import (
 
 // An Engine is the OpenEngine interface - all actions should be done using it.
 type Engine struct {
-	Systems      []System      `json:"systems"`
-	Resources    []Resource    `json:"resources"`
-	Providers    []Provider    `json:"providers"`
-	Provisioners []Provisioner `json:"provisioners"`
-	Solutions    []Solution    `json:"solutions"`
-	Tools        []Tool        `json:"tools"`
+	Systems      map[string]System `json:"systems"`
+	Resources    []Resource        `json:"resources"`
+	Providers    []Provider        `json:"providers"`
+	Provisioners []Provisioner     `json:"provisioners"`
+	Solutions    []Solution        `json:"solutions"`
+	Tools        []Tool            `json:"tools"`
 }
 
 // NewEngine creates a new engine instance.
@@ -26,8 +26,11 @@ func NewEngine() *Engine {
 }
 
 // AddSystem will add a system to the engine.
-func (e *Engine) AddSystem(system System) {
-	e.Systems = append(e.Systems, system)
+func (e *Engine) AddSystem(systemName string, system map[string]interface{}) {
+	if e.Systems == nil {
+		e.Systems = map[string]System{}
+	}
+	e.Systems[systemName] = system
 }
 
 // AddResource will add a resource to the engine.
@@ -37,10 +40,12 @@ func (e *Engine) AddResource(resource Resource) {
 
 // AddProvider will add a provider to the engine.
 func (e *Engine) AddProvider(api ProviderAPI) {
-	for resourceType, resource := range api {
-		for _, provider := range resource.Providers {
-			provider.Implicit = resource.Implicit
-			provider.Resource = resourceType
+	for key, val := range api {
+		// the key is resource type, e.x.: Server
+		// The val is the provider section(Resource in Engine.Provider) in provider.yaml
+		for _, provider := range val.Providers {
+			provider.Implicit = val.Implicit
+			provider.Resource = key
 			e.Providers = append(e.Providers, provider)
 		}
 	}
@@ -69,16 +74,27 @@ func (e *Engine) Match() error {
 	jsonschema.RegisterKeyword("oeRequired", NewOeRequired)
 
 	for _, resource := range e.Resources {
-		for _, system := range e.Systems {
-			solutions, err := e.matchProvidersProvisioners(resource, system)
+		if SystemName := resource.SystemName; SystemName != "" {
+			if systemcontent, ok := e.Systems[SystemName]; ok {
+				solutions, err := e.matchProvidersProvisioners(resource, systemcontent)
+				if err != nil {
+					return err
+				}
+				e.Solutions = append(e.Solutions, solutions...)
+				continue
+			}
+			return xerrors.Errorf("No solution for this specific system")
+		}
+		for _, systemcontent := range e.Systems {
+			solutions, err := e.matchProvidersProvisioners(resource, systemcontent)
 			if err != nil {
 				return err
 			}
 
 			e.Solutions = append(e.Solutions, solutions...)
 		}
-	}
 
+	}
 	return nil
 }
 
