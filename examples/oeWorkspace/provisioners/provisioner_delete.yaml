@@ -1,0 +1,15 @@
+---
+OpenstackServerDelete:
+  delete:
+    - match:
+        type: object
+        properties:
+          providerType:
+            type: string
+      parameters:
+        resource_id:
+          type: string
+      required:
+        - resource_id
+      logic: "template/terraform_openstack_delete.tmpl"
+      debug: false

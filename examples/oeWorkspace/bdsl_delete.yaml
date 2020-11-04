@@ -1,0 +1,16 @@
+---
+api:
+  - "apis/provider_delete.yaml"
+provisioners:
+  - "provisioners/provisioner_delete.yaml"
+systems:
+  OpenStack:
+    providerType: Openstack
+tools:
+  - "tools/tools.yaml"
+resources:
+  - resource: OpenstackServerDelete
+    system_name: OpenStack
+    # Should have format of Provider_Resourcetype
+    args: 
+      resource_id: "60cacaff-86a6-4f88-82a4-ed3023724df1"

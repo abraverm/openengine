@@ -1,0 +1,19 @@
+cat << EOF > terraformdelete.tf
+provider "openstack" {
+  user_name        = "{{.user_name}}"
+  tenant_name      = "{{.user_name}}"
+  password         = "{{.user_name}}"
+  auth_url         = "{{.user_name}}"
+  domain_name = "{{.user_name}}"
+}
+
+resource "openstack_compute_instance_v2" "delete" {
+    name = "InstanceDeleted"
+}
+
+EOF
+terraform init
+terraform import openstack_compute_instance_v2.delete {{.resource_id}}
+terraform destroy -auto-approve
+rm .terraform/ terraform.tfstate terraformdelete.tf -rf
+#echo "Server {{ .resource_id }} was created"
