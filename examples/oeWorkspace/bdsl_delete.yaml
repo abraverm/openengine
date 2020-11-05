@@ -9,7 +9,7 @@ systems:
 tools:
   - "tools/tools.yaml"
 resources:
-  - resource: OpenstackServerDelete
+  - resource: Server
     system_name: OpenStack
     # Should have format of Provider_Resourcetype
     args: 
