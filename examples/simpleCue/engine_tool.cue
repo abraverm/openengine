@@ -1,4 +1,4 @@
-package engine
+package example
 
 
 import (
@@ -8,6 +8,6 @@ import (
 command: engine: {
 
  task: run: exec.Run & {
-  cmd: "cue eval --out json --ignore --inject action=\(_action)"
+  cmd: "cue eval -p example --out json --ignore --inject action=\(_action)"
  }
 }

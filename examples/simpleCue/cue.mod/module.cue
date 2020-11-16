@@ -1,1 +1,1 @@
-module: ""
+module: "simpleCue.io"
