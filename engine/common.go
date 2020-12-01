@@ -1,3 +1,4 @@
+// common is where all the common struct go
 package engine
 
 import (

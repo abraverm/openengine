@@ -1,5 +1,5 @@
-// Package common contains shared functions, types and const used by oe commands
-package main
+// Package controller provide all first layer method used by either cli or REST API
+package controller
 
 import (
 	"context"
@@ -7,14 +7,14 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"os"
+	"openengine/util"
 	"path/filepath"
 
-	"github.com/abraverm/openengine/engine"
-	"github.com/abraverm/openengine/runner"
 	"github.com/goccy/go-yaml"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/xerrors"
+	"openengine/engine"
+	"openengine/runner"
 )
 
 // DSL is the result of processing the ie dsl file and manages the engine operations.
@@ -25,15 +25,6 @@ type DSL struct {
 	Tools        []string          `yaml:"tools"`
 	Resources    []engine.Resource `yaml:"resources"`
 	Engine       engine.Engine
-}
-
-func fileExists(filename string) bool {
-	info, err := os.Stat(filename)
-	if os.IsNotExist(err) {
-		return false
-	}
-
-	return !info.IsDir()
 }
 
 func getSource(uri string) ([]byte, error) {
@@ -60,7 +51,7 @@ func getSource(uri string) ([]byte, error) {
 
 		data, _ = ioutil.ReadAll(res.Body)
 
-	case fileExists(uri):
+	case util.FileExists(uri):
 		data, err := ioutil.ReadFile(filepath.Clean(uri))
 		if err != nil {
 			return nil, fmt.Errorf("unable to read %w", err)
@@ -75,8 +66,6 @@ func getSource(uri string) ([]byte, error) {
 }
 
 // CreateEngine process dsl data and initialize the engine
-// nolint: funlen
-// TODO: function too long (70 > 60) .
 func (d *DSL) CreateEngine() {
 	e := engine.NewEngine()
 

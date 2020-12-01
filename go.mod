@@ -1,4 +1,4 @@
-module github.com/abraverm/openengine
+module openengine
 
 go 1.14
 
