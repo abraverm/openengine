@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"sort"
 
-	"github.com/abraverm/openengine/engine"
+	"openengine/engine"
 )
 
 // Schedule type.

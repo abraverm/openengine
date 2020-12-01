@@ -10,9 +10,9 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/abraverm/openengine/engine"
 	"github.com/imdario/mergo"
 	"golang.org/x/xerrors"
+	"openengine/engine"
 )
 
 // Runner interface standardizes the execution process no matter how it is actually computed.
