@@ -4,13 +4,13 @@ package runner
 import (
 	"fmt"
 	"io/ioutil"
+	"openengine/engine"
 	"os"
 	"os/exec"
 	"regexp"
 	"strings"
 	"text/template"
 
-	"github.com/abraverm/openengine/engine"
 	"github.com/imdario/mergo"
 	"golang.org/x/xerrors"
 )

@@ -1,10 +1,9 @@
 package runner
 
 import (
+	"openengine/engine"
 	"reflect"
 	"sort"
-
-	"github.com/abraverm/openengine/engine"
 )
 
 // Schedule type.

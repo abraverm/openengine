@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"testing"
 )
 
-func Test_run(t *testing.T) {
+func TestRun(t *testing.T) {
 	args := []string{} //os.Args[0:1] // Name of the program.
 	tests := []struct {
 		name    string
@@ -27,20 +28,15 @@ func Test_run(t *testing.T) {
 	}
 }
 
-func Test_deploy(t *testing.T) {
-	tests := []struct {
-		name    string
-		dsl     string
-		wantErr error
-	}{
-		{"empty", "testdata/empty", nil},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := deploy(tt.dsl, true)
-			if fmt.Sprint(err) != fmt.Sprint(tt.wantErr) {
-				t.Errorf("CLI test %v of '%v' expected '%v' but got '%v'", tt.name, tt.dsl, tt.wantErr, err)
-			}
-		})
-	}
+func TestEntryPoint(t *testing.T) {
+	fmt.Println(os.Args)
+
+	os.Args = []string{"oe"}
+	main()
+}
+
+func TestMain(m *testing.M) {
+	exitcode := m.Run()
+	os.RemoveAll("oe.log")
+	os.Exit(exitcode)
 }

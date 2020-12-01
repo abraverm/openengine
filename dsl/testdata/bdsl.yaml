@@ -1,0 +1,17 @@
+---
+api:
+  - provider.yaml
+provisioners:
+  - linchpin.yaml
+systems:
+  - providerType: Openstack
+tools:
+  - tools.yaml
+resources:
+  - resource: Server
+    args:
+      _memory: 4GiB
+      _disk: 100GiB
+      imageRef: Fedora-31
+      key_name: ccit
+      networks: ccit-net

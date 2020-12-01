@@ -1,0 +1,5 @@
+plugins:
+  govet:
+    enabled: false
+    exclude_patterns:
+    - "**/main.go"

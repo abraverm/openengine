@@ -9,7 +9,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/abraverm/openengine/engine"
+	"openengine/engine"
 
 	"github.com/imdario/mergo"
 

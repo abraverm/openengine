@@ -1,80 +1,16 @@
+// package main is the entrypoint of OpenEngine
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"io"
-	"io/ioutil"
+	"openengine/controller"
 	"os"
-	"path/filepath"
 
-	nested "github.com/antonfisher/nested-logrus-formatter"
-	"github.com/goccy/go-yaml"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 	"github.com/urfave/cli/v2/altsrc"
-	"golang.org/x/xerrors"
 )
 
-// nolint: G304
-func initLogger(path string, debug, verbose bool) {
-	log.SetFormatter(&nested.Formatter{
-		HideKeys:    true,
-		FieldsOrder: []string{"component", "category"},
-	})
-
-	logFile, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.SetOutput(logFile)
-
-	if verbose {
-		mw := io.MultiWriter(os.Stdout, logFile)
-		log.SetOutput(mw)
-	}
-
-	log.SetLevel(log.InfoLevel)
-
-	if debug {
-		log.SetLevel(log.DebugLevel)
-	}
-}
-
-func deploy(path string, noop bool) error {
-	filename, _ := filepath.Abs(path)
-
-	yamlFile, err := ioutil.ReadFile(filepath.Clean(filename))
-	if err != nil {
-		return xerrors.Errorf("Unable to read DSL file:\n%v", err)
-	}
-
-	var dsl DSL
-
-	err = yaml.UnmarshalWithOptions(yamlFile, &dsl, yaml.Strict())
-	if err != nil {
-		return xerrors.Errorf("Unable to parse DSL file:\n%v", err.Error())
-	}
-
-	dsl.CreateEngine()
-
-	if noop {
-		engineJSON, _ := json.MarshalIndent(dsl.Engine, "", "  ")
-
-		fmt.Println(string(engineJSON))
-
-		return nil
-	}
-
-	if err := dsl.Run("create"); err != nil {
-		return xerrors.Errorf("Engine failed to run:\n%v", err)
-	}
-
-	return nil
-}
-
-// nolint: funlen
+// nolint:G304
 func run(args []string) error {
 	app := &cli.App{
 		Name:        "oe",
@@ -128,12 +64,13 @@ func run(args []string) error {
 				"resolve the APIs and other requirements to provision requested resources",
 			Before: altsrc.InitInputSourceWithContext(flags, altsrc.NewYamlSourceFromFlagFunc("config")),
 			Action: func(c *cli.Context) error {
-				if c.NArg() == 0 {
-					return xerrors.Errorf("no DSL file was provided (argument)")
-				}
-				initLogger(c.String("log"), c.Bool("debug"), c.Bool("verbose"))
-
-				return deploy(c.Args().Get(0), c.Bool("noop"))
+				return controller.Deploy(controller.DeployParam{
+					Log:     c.String("log"),
+					Debug:   c.Bool("debug"),
+					Verbose: c.Bool("verbose"),
+					Path:    c.Args().Get(0),
+					Noop:    c.Bool("noop"),
+				})
 			},
 		},
 	}
