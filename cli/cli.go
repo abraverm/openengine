@@ -1,17 +1,15 @@
-// package main is the entrypoint of OpenEngine
-package main
+// Package cli is the Command Line Interface of Openengine, it's also the entrypoint of the program
+package cli
 
 import (
 	"openengine/controller"
-	"os"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 	"github.com/urfave/cli/v2/altsrc"
 )
 
 // nolint:G304
-func run(args []string) error {
+func Run(args []string) error {
 	app := &cli.App{
 		Name:        "oe",
 		Description: "OpenEgnine command line tool",
@@ -63,15 +61,7 @@ func run(args []string) error {
 			Description: "Deploy command will parse the DSL file, " +
 				"resolve the APIs and other requirements to provision requested resources",
 			Before: altsrc.InitInputSourceWithContext(flags, altsrc.NewYamlSourceFromFlagFunc("config")),
-			Action: func(c *cli.Context) error {
-				return controller.Deploy(controller.DeployParam{
-					Log:     c.String("log"),
-					Debug:   c.Bool("debug"),
-					Verbose: c.Bool("verbose"),
-					Path:    c.Args().Get(0),
-					Noop:    c.Bool("noop"),
-				})
-			},
+			Action: cliDeploy,
 		},
 	}
 
@@ -80,9 +70,12 @@ func run(args []string) error {
 	return app.Run(args)
 }
 
-func main() {
-	err := run(os.Args)
-	if err != nil {
-		log.Fatal(err)
-	}
+func cliDeploy(c *cli.Context) error {
+	return controller.Deploy(controller.DeployParam{
+		Log:     c.String("log"),
+		Debug:   c.Bool("debug"),
+		Verbose: c.Bool("verbose"),
+		Path:    c.Args().Get(0),
+		Noop:    c.Bool("noop"),
+	})
 }

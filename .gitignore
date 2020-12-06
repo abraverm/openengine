@@ -15,4 +15,5 @@
 # vendor/
 **/*.log
 
+#output of the coverage
 **/coverage.txt

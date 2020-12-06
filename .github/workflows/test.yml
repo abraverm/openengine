@@ -17,7 +17,7 @@ jobs:
     - name: Build
       env:
         GOPROXY: "https://proxy.golang.org"
-      run: go build ./cli/oe
+      run: go build
     - name: Test
       run: go test -race -covermode=atomic -coverprofile=coverage.txt -coverpkg=./... ./...
     - uses: codecov/codecov-action@v1

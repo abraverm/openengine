@@ -1,4 +1,4 @@
-package main
+package cli
 
 import (
 	"fmt"
@@ -20,19 +20,12 @@ func TestRun(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			args = append(args, tt.args...) // Append a flag
-			err := run(args)
+			err := Run(args)
 			if fmt.Sprint(tt.wantErr) != fmt.Sprint(err) {
 				t.Errorf("CLI test %v of '%v' expected '%v' but got '%v'", tt.name, tt.args, tt.wantErr, err)
 			}
 		})
 	}
-}
-
-func TestEntryPoint(t *testing.T) {
-	fmt.Println(os.Args)
-
-	os.Args = []string{"oe"}
-	main()
 }
 
 func TestMain(m *testing.M) {

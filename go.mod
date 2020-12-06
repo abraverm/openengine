@@ -14,7 +14,6 @@ require (
 	github.com/qri-io/jsonpointer v0.1.1
 	github.com/qri-io/jsonschema v0.2.0
 	github.com/sirupsen/logrus v1.6.0
-	github.com/stretchr/testify v1.4.0
 	github.com/urfave/cli/v2 v2.0.0-20200824212017-2ae03fa69ce7
 	golang.org/x/sys v0.0.0-20200323222414-85ca7c5b95cd // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1
