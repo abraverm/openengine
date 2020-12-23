@@ -20,7 +20,6 @@ func Run(args []string) error {
 			},
 		},
 	}
-
 	flags := []cli.Flag{
 		altsrc.NewBoolFlag(&cli.BoolFlag{
 			Name:    "noop",
@@ -53,7 +52,6 @@ func Run(args []string) error {
 			Value:   "oe.yaml",
 		},
 	}
-
 	app.Commands = []*cli.Command{
 		{
 			Name:  "deploy",
@@ -64,9 +62,7 @@ func Run(args []string) error {
 			Action: cliDeploy,
 		},
 	}
-
 	app.Flags = flags
-
 	return app.Run(args)
 }
 
