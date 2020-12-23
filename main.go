@@ -7,6 +7,7 @@ import (
 	"os"
 )
 
+// nolint:G304
 func main() {
 	err := cli.Run(os.Args)
 	if err != nil {
