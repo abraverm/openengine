@@ -16,7 +16,7 @@ import (
 	"golang.org/x/xerrors"
 )
 
-// nolint: G304
+// nolint: gosec
 func initLogger(path string, debug, verbose bool) {
 	log.SetFormatter(&nested.Formatter{
 		HideKeys:    true,

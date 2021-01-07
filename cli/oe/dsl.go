@@ -11,8 +11,6 @@ import (
 	"path/filepath"
 
 	"github.com/abraverm/openengine/engine"
-	"github.com/abraverm/openengine/runner"
-	"github.com/goccy/go-yaml"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/xerrors"
 )
@@ -24,7 +22,7 @@ type DSL struct {
 	Systems      []engine.System   `yaml:"systems"`
 	Tools        []string          `yaml:"tools"`
 	Resources    []engine.Resource `yaml:"resources"`
-	Engine       engine.Engine
+	Engine       *engine.Engine
 }
 
 func fileExists(filename string) bool {
@@ -74,100 +72,55 @@ func getSource(uri string) ([]byte, error) {
 	return data, nil
 }
 
-// CreateEngine process dsl data and initialize the engine
-// nolint: funlen
-// TODO: function too long (70 > 60) .
+func (d *DSL) add(obj interface{}, def string) {
+	switch def {
+	case "System":
+		err := d.Engine.AddSystem(obj.(engine.System))
+		if err != nil {
+			log.Errorf("unable to add system #{system}: \n #{err}")
+		}
+	case "Resource":
+		err := d.Engine.AddResource(obj.(engine.Resource))
+		if err != nil {
+			log.Errorf("unable to add resource #{resource}: \n #{err}")
+		}
+	case "Provider", "Provisioner", "Tool":
+		target := obj.(string)
+
+		data, err := getSource(target)
+		if err != nil {
+			log.Errorf("unable to load get source of %v:\n%v", target, err)
+		}
+
+		err = d.Engine.Add(target, def, string(data))
+		if err != nil {
+			log.Errorf("unable to add #{def} #{target}:\n#{err}")
+		}
+	}
+}
+
+// CreateEngine process dsl data and initialize the engine.
 func (d *DSL) CreateEngine() {
-	e := engine.NewEngine()
+	d.Engine, _ = engine.NewEngine("")
 
 	for _, system := range d.Systems {
-		e.AddSystem(system)
+		d.add(system, "system")
 	}
 
 	for _, resource := range d.Resources {
-		e.AddResource(resource)
+		d.add(resource, "resource")
 	}
 
 	for _, provider := range d.API {
-		data, err := getSource(provider)
-		if err != nil {
-			log.Errorf("unable to load get source of %v:\n%v", provider, err)
-		}
-
-		var parsedData engine.ProviderAPI
-		err = yaml.UnmarshalWithOptions(data, &parsedData, yaml.Strict())
-
-		if err != nil {
-			log.Errorf("unable to parse %v as a provider:\n %v", provider, err)
-		}
-
-		e.AddProvider(parsedData)
+		d.add(provider, "Provider")
 	}
 
 	for _, provisioner := range d.Provisioners {
-		data, err := getSource(provisioner)
-		if err != nil {
-			log.Errorf("unable to load get source of %v:\n%v", provisioner, err)
-		}
-
-		var parsedData engine.ProvisionerAPI
-		if err := yaml.UnmarshalWithOptions(data, &parsedData, yaml.Strict()); err != nil {
-			log.Errorf("unable to parse %v as a provisioner:\n %v", provisioner, err)
-		}
-
-		for resourceName, resourceActions := range parsedData {
-			for actionName, actionProvisioners := range resourceActions {
-				for _, actionProvisioner := range actionProvisioners {
-					actionProvisioner.Resource = resourceName
-					actionProvisioner.Action = actionName
-					e.AddProvisioner(actionProvisioner)
-				}
-			}
-		}
+		d.add(provisioner, "Provisioner")
 	}
-
-	for _, tool := range d.Tools {
-		data, err := getSource(tool)
-		if err != nil {
-			log.Errorf("unable to load get source of %v:\n%v", tool, err)
-		}
-
-		var parsedData engine.ToolAPI
-		err = yaml.UnmarshalWithOptions(data, &parsedData, yaml.Strict())
-
-		if err != nil {
-			log.Errorf("unable to parse %v as a tool:\n %v", tool, err)
-		}
-
-		e.AddTool(parsedData)
-	}
-
-	if err := e.Match(); err != nil {
-		log.Fatalf("New engine match process failed:\n%v", err)
-	}
-
-	e.Resolve()
-	d.Engine = *e
 }
 
 // Run ignites the engine and get it to run found solutions for give action.
 func (d DSL) Run(action string) error {
-	scheduler := runner.ResourceNumScheduler{
-		Solutions: d.Engine.Solutions,
-	}
-	local := runner.NewLocalRunner(d.Engine, action, scheduler)
-
-	result, err := runner.Run(local)
-	if err != nil {
-		return err
-	}
-
-	log.Info(result)
-
 	return nil
-}
-
-// GetSolutions wrapper function?
-func (d *DSL) GetSolutions() []engine.Solution {
-	return d.Engine.GetSolutions()
 }
