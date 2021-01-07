@@ -1,0 +1,4 @@
+{
+    type: "Openstack"
+    name: "Minimal"
+}

@@ -1,4 +1,10 @@
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 name: Test
 jobs:
   test:
@@ -18,8 +24,10 @@ jobs:
       env:
         GOPROXY: "https://proxy.golang.org"
       run: go build ./cli/oe
-    - name: Test
-      run: go test -race -covermode=atomic -coverprofile=coverage.txt -coverpkg=./... ./...
+    - name: Test Engine
+      run: go test -v -short -timeout 0 -covermode=atomic -coverprofile=coverage.txt -coverpkg=./... ./engine
+    - name: Test CLI
+      run: go test -v -short -timeout 0 -covermode=atomic -coverprofile=coverage.txt -coverpkg=./... ./cli/oe
     - uses: codecov/codecov-action@v1
       with:
         file: ./coverage.txt

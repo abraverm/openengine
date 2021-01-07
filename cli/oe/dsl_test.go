@@ -3,17 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"testing"
-
-	"github.com/abraverm/openengine/engine"
-
-	"github.com/nsf/jsondiff"
-
-	"github.com/imdario/mergo"
 )
 
 type ctrl struct {
@@ -91,89 +84,4 @@ func Test_getSource(t *testing.T) {
 			}
 		})
 	}
-}
-
-type DSLTestSet struct {
-	Description string
-	DSL         DSL
-	Tests       []struct {
-		Description string
-		Action      string
-		Args        []interface{}
-		Want        []interface{}
-	}
-}
-
-func TestDSL(t *testing.T) {
-	tests := 0
-	passed := 0
-	data, err := ioutil.ReadFile("testdata/dsl.json")
-	if err != nil {
-		t.Errorf("error loading test file: %s", err.Error())
-		return
-	}
-	testSets := []*DSLTestSet{}
-	if err := json.Unmarshal(data, &testSets); err != nil {
-		t.Errorf("error unmarshaling test set from JSON: %s", err.Error())
-		return
-	}
-	opt := jsondiff.DefaultConsoleOptions()
-	t.Run("DSL", func(t *testing.T) {
-		for _, ts := range testSets {
-			for i, c := range ts.Tests {
-				tests++
-				d := ts.DSL
-				var args []reflect.Value
-				switch c.Action {
-				case "CreateEngine":
-					want := DSL{}
-					wJSON, _ := json.Marshal(c.Want[0])
-					tmpDSL := ts.DSL
-					json.Unmarshal(wJSON, &want)
-					if err := mergo.Merge(&tmpDSL, want, mergo.WithAppendSlice); err != nil {
-						t.Errorf("%s test case %d: %s. error: %s", ts.Description, i, c.Description, err)
-					}
-					c.Want[0] = tmpDSL
-				case "Run":
-					d.CreateEngine()
-					err := d.Run(fmt.Sprint(c.Args[0]))
-					if fmt.Sprint(c.Want[0]) != fmt.Sprint(err) {
-						t.Errorf("%s test case %d: %s. error: %s", ts.Description, i, c.Description, err)
-					} else {
-						passed++
-					}
-					continue
-				case "GetSolutions":
-					want := []engine.Solution{}
-					wJSON, _ := json.Marshal(c.Want[0])
-					json.Unmarshal(wJSON, &want)
-					d.CreateEngine()
-					solutions := d.GetSolutions()
-					eJSON, _ := json.Marshal(solutions)
-					if result, diff := jsondiff.Compare(eJSON, wJSON, &opt); result.String() != "FullMatch" {
-						t.Errorf("%s test case %d: %s. error: %s", ts.Description, i, c.Description, diff)
-					} else {
-						passed++
-					}
-					continue
-				}
-				dsl := reflect.ValueOf(&d)
-				method := dsl.MethodByName(c.Action)
-				if !method.IsValid() {
-					t.Errorf("%s test case %d: %s. error: Unknown method or private '%s'", ts.Description, i, c.Description, c.Action)
-					continue
-				}
-				results := method.Call(args)
-				if len(results) == 0 {
-					eJSON, _ := json.Marshal(d)
-					wJSON, _ := json.Marshal(c.Want[0])
-					if result, diff := jsondiff.Compare(eJSON, wJSON, &opt); result.String() != "FullMatch" {
-						t.Errorf("%s test case %d: %s. error: %s", ts.Description, i, c.Description, diff)
-					} else {
-						passed++
-					}
-				}
-			}
-		}
-	})
 }
