@@ -3,7 +3,7 @@ module github.com/abraverm/openengine
 go 1.14
 
 require (
-	cuelang.org/go v0.3.0-beta.1
+	cuelang.org/go v0.3.0-beta.5
 	github.com/antonfisher/nested-logrus-formatter v1.1.0
 	github.com/goccy/go-yaml v1.8.0
 	github.com/nsf/jsondiff v0.0.0-20200515183724-f29ed568f4ce

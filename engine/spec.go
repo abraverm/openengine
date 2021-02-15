@@ -233,12 +233,12 @@ Resources: [...#Resource]
   }) | { action: string | *"" }
   interfaces: {
     for param, options in (*match.interfaces | [] ){
-      "\(param)":[ for i in [
+      "\(param)": [ for i in [
         for o in options
         for s in resource.solutions
         {
           *{
-            response: s.match.response & close({ for p, v in o.response {"\(p)": v & s.match.response[p]}})
+            response: { for p, v in o.response { "\(p)": *(v & s.match.response[p]) | null } }
             action: s.match.action & o.action
 			name: o.name
 			type: s.match.type & o.type
@@ -246,7 +246,7 @@ Resources: [...#Resource]
             solution: s
           } | null
         }
-      ] if i != null { i } ]
+      ] if i != null && len(*[ for r in i.response if r == null { r } ] | []) == 0  { i } ]
     }
   }
   constrains: [ for x in [
@@ -534,11 +534,11 @@ Provisioners: [ for _, p in provisioners { p } ]
 }
 
 
-#globalNames: list.SortStrings([ for name, resource in resources { (*resource.name | name) } ])
+#globalNames: list.SortStrings([ for name, resource in resources {  strings.TrimSpace(*resource.name | name) } ])
 globalUniqueNames: list.UniqueItems(#globalNames)
 #GroupsByNames: (#CreateGroups & {
     input: [ for name, resource in resources {
-        [(*resource.name | name)] + resource.dependencies
+         [strings.TrimSpace(*resource.name | name)] + resource.dependencies
       }
     ]
   }).out
@@ -609,7 +609,7 @@ DependencyGroupsSolutionsDecoupled: list.FlattenN([
  		  for c in (#DecoupleGroup & { #set: set, #resources: #DependencyGroups[gid], ... }).out if len(c) > 0 {[
 			for s in c{
               name: s.name
-              properties: s.properties
+              properties: s.properties & {...}
               provisioner: s.provisioner
               resource: s.resource
               constrains: s.constrains
