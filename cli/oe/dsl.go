@@ -43,6 +43,7 @@ func getSource(uri string) ([]byte, error) {
 	case urlParsed != nil:
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, uri, nil)
 
+		// nolint: exhaustivestruct
 		client := http.Client{}
 
 		res, err := client.Do(req)

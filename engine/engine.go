@@ -3,6 +3,9 @@ package engine
 
 import (
 	"crypto/sha256"
+
+	// no other use than loading the default spec.
+	_ "embed"
 	"encoding/hex"
 	"fmt"
 	"io/ioutil"
@@ -18,6 +21,11 @@ import (
 	"golang.org/x/xerrors"
 )
 
+// SPEC is global variable to store OpenEngine default specifications
+//go:embed spec.cue
+// nolint
+var SPEC string
+
 // An Engine is the OpenEngine interface - all actions should be done using it.
 type Engine struct {
 	cue struct {
@@ -31,7 +39,7 @@ type Engine struct {
 func loadFile(path string) (string, error) {
 	info, err := os.Stat(path)
 	if os.IsNotExist(err) {
-		return "", err
+		return "", fmt.Errorf("file %s doesn't exist: %w", path, err)
 	}
 
 	if info.IsDir() {
@@ -40,7 +48,7 @@ func loadFile(path string) (string, error) {
 
 	file, err := ioutil.ReadFile(path) // nolint: gosec
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("unable to read file %s: %w", path, err)
 	}
 
 	return string(file), nil
@@ -49,7 +57,7 @@ func loadFile(path string) (string, error) {
 func (e *Engine) loadSpec(path string) error {
 	switch path {
 	case "":
-		if err := e.addDefinition("spec.cue", spec); err != nil {
+		if err := e.addDefinition("spec.cue", SPEC); err != nil {
 			return err
 		}
 
@@ -69,6 +77,8 @@ func (e *Engine) loadSpec(path string) error {
 
 // NewEngine creates an Engine and initialize it.
 func NewEngine(spec string) (*Engine, error) {
+	//TODO: there is no need for the sub struct "cue"
+	// nolint
 	e := Engine{}
 	e.cue.runtime = &cue.Runtime{}
 
@@ -86,14 +96,14 @@ func (e *Engine) addDefinition(path string, definition string) error {
 
 	instance, err := r.Compile(path, e.cue.spec+definition)
 	if err != nil {
-		return err
+		return fmt.Errorf("bad definition %s: %w", definition, err)
 	}
 
 	e.cue.instance = instance
 	e.cue.runtime = r
 	e.cue.spec += definition
 
-	return err
+	return nil
 }
 
 func (e Engine) validateValue(value cue.Value, def string) (err error) {
@@ -104,7 +114,7 @@ func (e Engine) validateValue(value cue.Value, def string) (err error) {
 	err = e.cue.codec.Validate(defValue, x)
 
 	if _, err := defValue.Unify(value).MarshalJSON(); err != nil {
-		return err
+		return fmt.Errorf("converting to JSON failed: %w", err)
 	}
 
 	return
@@ -115,7 +125,7 @@ func (e Engine) validateRaw(path, def, content string) error {
 
 	instance, err := r.Compile(path, content)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to compile: %w", err)
 	}
 
 	return e.validateValue(instance.Value(), def)
@@ -160,7 +170,7 @@ func (e Engine) addObject(obj interface{}, def string) error {
 
 	objValue, _ := e.cue.codec.Decode(obj)
 	if err := defValue.Unify(objValue).Validate(); err != nil {
-		return err
+		return fmt.Errorf("failed validation: %w", err)
 	}
 
 	objCue, _ := format.Node(objValue.Syntax())
@@ -182,7 +192,7 @@ func (e *Engine) AddResource(resource Resource) error {
 func (e *Engine) Solutions(action string) (results string, err error) {
 	actionValue := e.cue.instance.Lookup("ACTION")
 	if err := e.cue.codec.Validate(actionValue, action); err != nil {
-		return "[]", err
+		return "[]", fmt.Errorf("invalid action: %w", err)
 	}
 
 	instance, _ := e.cue.instance.Fill(action, "ACTION")
@@ -191,7 +201,7 @@ func (e *Engine) Solutions(action string) (results string, err error) {
 
 	result, err := format.Node(solutions.Syntax(cue.Concrete(true)))
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("specification failure: %w", err)
 	}
 
 	if strings.Contains(string(result), "_|_") {
