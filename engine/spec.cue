@@ -1,11 +1,3 @@
-package engine
-
-// Workaround until go 1.16 that will support packaging static files[1]
-// Other solutions do the same thing with additional tooling\process
-// which is useful when there are many files.
-// [1]: https://github.com/golang/go/issues/41191
-// nolint: lll
-const spec = `
 import "list"
 import "math"
 import "crypto/sha256"
@@ -410,7 +402,7 @@ Resources: [...#Resource]
   #explode: {
     #solutions: [...]
     #dependencies: [...string]
-    input: { for d in #dependencies { "\(d)": [ for s in #solutions if s.resource.name == d { 
+    input: { for d in #dependencies { "\(d)": [ for s in #solutions if s.resource.name == d {
       name: s.name
       _id: s._id
       resource: s.resource
@@ -424,7 +416,7 @@ Resources: [...#Resource]
     }]} }
     combos: (#combo & {#input: input}).out
     out: [ for c in combos {[for d, s in c { s }]}]
-  } 
+  }
   depended_resolved_decoupled: [
     for resource in depended_resolved
     for set in (#explode & {#solutions: dependless_solutions + xsolutions, #dependencies: resource.dependencies}).out
@@ -444,7 +436,7 @@ Resources: [...#Resource]
     for provider in #providers
     for provisioner in #provisioners
     {*(#Solution & { match:action: action, resource: xresource, System: system, #provider: provider, #provisioner: provisioner }) | {resolved: false}}
-  ] if s.resolved { s }] 
+  ] if s.resolved { s }]
 
   // Recursion:
   Saction: action
@@ -482,7 +474,7 @@ Resources: [...#Resource]
     resolved: o.resolved
 	resource: o.resource
 	system: o.system
-  }] 
+  }]
 }
 
 
@@ -557,7 +549,7 @@ ACTION: #Action
 // Each group will have a set of solutions per system, each set is complete:
 // User dependencies, constrains and implicit tasks are all resolved
 // Note: set might contain multiple solutions for one resource
-#DependencyGroupsSolutions: [ 
+#DependencyGroupsSolutions: [
 	for group in #DependencyGroups {[
 		for System in Systems {
            (#Solutions & {
@@ -618,5 +610,4 @@ DependencyGroupsSolutionsDecoupled: list.FlattenN([
           ]}
 		]}
 	]}
-], 2) // 2 or 3?
-`
+], 2)

@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -16,7 +15,7 @@ import (
 	"golang.org/x/xerrors"
 )
 
-// nolint: gosec
+// nolint: gosec, exhaustivestruct
 func initLogger(path string, debug, verbose bool) {
 	log.SetFormatter(&nested.Formatter{
 		HideKeys:    true,
@@ -62,7 +61,7 @@ func deploy(path string, noop bool) error {
 	if noop {
 		engineJSON, _ := json.MarshalIndent(dsl.Engine, "", "  ")
 
-		fmt.Println(string(engineJSON))
+		log.Info(string(engineJSON))
 
 		return nil
 	}
@@ -74,7 +73,7 @@ func deploy(path string, noop bool) error {
 	return nil
 }
 
-// nolint: funlen
+// nolint: funlen, exhaustivestruct
 func run(args []string) error {
 	app := &cli.App{
 		Name:        "oe",
@@ -144,8 +143,7 @@ func run(args []string) error {
 }
 
 func main() {
-	err := run(os.Args)
-	if err != nil {
+	if err := run(os.Args); err != nil {
 		log.Fatal(err)
 	}
 }
