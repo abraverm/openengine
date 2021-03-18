@@ -1,13 +1,12 @@
 package main
 
 import (
-	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
-	nested "github.com/antonfisher/nested-logrus-formatter"
 	"github.com/goccy/go-yaml"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
@@ -17,10 +16,11 @@ import (
 
 // nolint: gosec, exhaustivestruct
 func initLogger(path string, debug, verbose bool) {
-	log.SetFormatter(&nested.Formatter{
-		HideKeys:    true,
-		FieldsOrder: []string{"component", "category"},
-	})
+	format := log.TextFormatter{
+		DisableTimestamp: true,
+		DisableQuote:     true,
+	}
+	log.SetFormatter(&format)
 
 	logFile, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
@@ -38,36 +38,38 @@ func initLogger(path string, debug, verbose bool) {
 
 	if debug {
 		log.SetLevel(log.DebugLevel)
+		log.Debug("running oe")
 	}
 }
 
-func deploy(path string, noop bool) error {
+func create(path string, noop bool) error {
 	filename, _ := filepath.Abs(path)
+
+	base := filepath.Dir(filename)
 
 	yamlFile, err := ioutil.ReadFile(filepath.Clean(filename))
 	if err != nil {
-		return xerrors.Errorf("Unable to read DSL file:\n%v", err)
+		return xerrors.Errorf("unable to read combination file:\n%v", err)
 	}
 
-	var dsl DSL
+	var c combination
 
-	err = yaml.UnmarshalWithOptions(yamlFile, &dsl, yaml.Strict())
+	if er := yaml.UnmarshalWithOptions(yamlFile, &c, yaml.Strict()); er != nil {
+		return fmt.Errorf("unable to parse combination file:\n%w", er)
+	}
+
+	e := createEngine(c, base)
+
+	solutions, err := e.Solutions("create")
 	if err != nil {
-		return xerrors.Errorf("Unable to parse DSL file:\n%v", err.Error())
+		return fmt.Errorf("engine failure: %w", err)
 	}
-
-	dsl.CreateEngine()
 
 	if noop {
-		engineJSON, _ := json.MarshalIndent(dsl.Engine, "", "  ")
-
-		log.Info(string(engineJSON))
+		log.Info(solutions)
+		log.Debug(e.GetSpec())
 
 		return nil
-	}
-
-	if err := dsl.Run("create"); err != nil {
-		return xerrors.Errorf("Engine failed to run:\n%v", err)
 	}
 
 	return nil
@@ -121,10 +123,10 @@ func run(args []string) error {
 
 	app.Commands = []*cli.Command{
 		{
-			Name:  "deploy",
+			Name:  "create",
 			Usage: "Create resources",
-			Description: "Deploy command will parse the DSL file, " +
-				"resolve the APIs and other requirements to provision requested resources",
+			Description: "Create command will parse the DSL file, " +
+				"resolve definitions and other requirements to provision requested resources",
 			Before: altsrc.InitInputSourceWithContext(flags, altsrc.NewYamlSourceFromFlagFunc("config")),
 			Action: func(c *cli.Context) error {
 				if c.NArg() == 0 {
@@ -132,7 +134,7 @@ func run(args []string) error {
 				}
 				initLogger(c.String("log"), c.Bool("debug"), c.Bool("verbose"))
 
-				return deploy(c.Args().Get(0), c.Bool("noop"))
+				return create(c.Args().Get(0), c.Bool("noop"))
 			},
 		},
 	}

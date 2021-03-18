@@ -64,17 +64,18 @@ func Test_getSource(t *testing.T) {
 	tests := []struct {
 		name    string
 		uri     string
+		base    string
 		want    []byte
 		wantErr bool
 	}{
-		{"empty", "", nil, true},
-		{"local file", "testdata/empty", []byte{}, false},
-		{"unreachable remote file", "http://asdfasddf.com:9999/file.yaml", nil, true},
-		{"unreachable remote file", fmt.Sprintf("%v/empty", srv.URL), []byte{}, false},
+		{"empty", "", "", nil, true},
+		{"local file", "testdata/empty", "", []byte{}, false},
+		{"unreachable remote file", "http://asdfasddf.com:9999/file.yaml", "", nil, true},
+		{"unreachable remote file", fmt.Sprintf("%v/empty", srv.URL), "", []byte{}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := getSource(tt.uri)
+			got, err := getSource(tt.uri, "")
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getSource() error = %v, wantErr %v", err, tt.wantErr)
 				return

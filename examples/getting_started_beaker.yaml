@@ -1,0 +1,16 @@
+---
+provisioners:
+  - provisioners/beaker_server_create.cue
+providers:
+  - providers/beaker_server_create.cue
+systems:
+  - type: Beaker
+    properties:
+      version: 25
+resources:
+  - type: Server
+    properties:
+      name: example_server_name
+      family: rhel75
+      method: nfs
+      arch: x86_64

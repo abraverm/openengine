@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"regexp"
 	"strings"
 
 	"cuelang.org/go/cue"
@@ -137,6 +138,9 @@ func (e *Engine) Add(path, def, content string) error {
 		return xerrors.New("Content is empty")
 	}
 
+	re := regexp.MustCompile(`\"\_(.*)\":`)
+	content = re.ReplaceAllString(content, "_${1}:")
+
 	defType := fmt.Sprintf("#%s", def)
 	if err := e.validateRaw(path, defType, content); err != nil {
 		return err
@@ -146,9 +150,8 @@ func (e *Engine) Add(path, def, content string) error {
 	h.Write([]byte(content)) // nolint: errcheck, gosec
 	sha := hex.EncodeToString(h.Sum(nil))
 	source := fmt.Sprintf("\n%ss:\"%s\":%s\n", strings.ToLower(def), sha, content)
-	e.addDefinition(path, source) // nolint: errcheck, gosec
 
-	return nil
+	return e.addDefinition(path, source)
 }
 
 // System is a provider instance that contains matching values and other metadata such as credentials.
@@ -164,11 +167,12 @@ type Resource struct {
 	Dependencies map[string]interface{}
 }
 
-func (e Engine) addObject(obj interface{}, def string) error {
+func (e *Engine) addObject(obj interface{}, def string) error {
 	defType := fmt.Sprintf("#%s", def)
 	defValue := e.cue.instance.LookupDef(defType)
 
 	objValue, _ := e.cue.codec.Decode(obj)
+
 	if err := defValue.Unify(objValue).Validate(); err != nil {
 		return fmt.Errorf("failed validation: %w", err)
 	}
@@ -209,4 +213,9 @@ func (e *Engine) Solutions(action string) (results string, err error) {
 	}
 
 	return string(result), nil
+}
+
+// GetSpec return engine current specification for debugging.
+func (e Engine) GetSpec() string {
+	return e.cue.spec
 }

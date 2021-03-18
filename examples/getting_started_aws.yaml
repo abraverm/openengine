@@ -1,0 +1,13 @@
+---
+provisioners:
+  - provisioners/aws_server_create.cue
+providers:
+  - providers/aws_server_create.cue
+systems:
+  - type: AWS
+resources:
+  - type: Server
+    properties:
+      ImageId: ami-60a54009
+      KeyName: my-key-pair
+      InstanceType: m1.small

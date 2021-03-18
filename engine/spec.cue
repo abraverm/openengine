@@ -194,27 +194,40 @@ Resources: [...#Resource]
 #resourceToHash: {
   #resource: #Resource
   new: {
-    type: #resource.type
+    type: *#resource.type | ""
     name: *#resource.name | ""
     system: *#resource.system | {}
-    properties: #resource.properties
-    dependencies: #resource.dependencies
-    dependedProperties: #resource.dependedProperties
+    properties: *#resource.properties | {}
+    dependencies: *#resource.dependencies | []
+    dependedProperties: *#resource.dependedProperties | []
     response: *#resource.response | {}
-    interfacesDependencies: #resource.interfacesDependencies
-    enabledInterfaces: #resource.enabledInterfaces
-    disabledInterfaces: #resource.disabledInterfaces
+    interfacesDependencies: *#resource.interfacesDependencies | []
+    enabledInterfaces: *#resource.enabledInterfaces | []
+    disabledInterfaces: *#resource.disabledInterfaces | []
   }
   out: (#structToHash & { #in: new }).out
 }
 
+#solutionId: {
+    #provider: {...}
+    #provisioner: {...}
+    #system: {...}
+    #resource: {...}
+    provider_id: *(#structToHash & {#in: #provider}).out | ""
+    provisioner_id: *(#structToHash & {#in: #provisioner}).out | ""
+    system_id: *(#structToHash & {#in: #system}).out | ""
+    resource_id: *(#resourceToHash & { #resource: #resource }).out | ""
+    out: provider_id + provisioner_id + system_id + resource_id
+}
 #Solution: {
   name: (*("R("+resource.name + ")")| "" ) + (*("S("+System.name+")")| "" ) + (*("PD("+#provider.name+")")| "" ) + (*("PR("+#provisioner.name+")")| "" )
-  _id: (#structToHash & {#in: #provider}).out + (#structToHash & {#in: #provisioner}).out + (#structToHash & {#in: System}).out + (#resourceToHash & { #resource: resource }).out
+  _id: (#solutionId & {#provider: #provider, #provisioner: #provisioner, #system: System, #resource: resource}).out
   #provider: #Provider
   #provisioner: #Provisioner
   resource: #Resource
   System: #System
+  #xids: [...]
+  #xsolutions: [...]
   #provisioner: properties: { ... }
   resource: properties: { ... }
   match: *(#provider & {
@@ -259,9 +272,10 @@ Resources: [...#Resource]
 					systems: [System]
 					#providers: Providers
 					#provisioners: Provisioners
-					xsolutions: []
+					xids: #xids + [_id]
+					xsolutions: #xsolutions
 					...
-					}).out & [...{resolved: true}]
+					}).results & [...{resolved: true}]
              }
             if (*task.script | "") != "" { task }
           }
@@ -278,9 +292,10 @@ Resources: [...#Resource]
 					systems: [System]
 					#providers: Providers
 					#provisioners: Provisioners
-					xsolutions: []
+					xids: #xids + [_id]
+					xsolutions: #xsolutions
 					...
-					}).out & [...{resolved: true}]
+					}).results & [...{resolved: true}]
              }
             if (*task.script | "") != "" { task }
           }
@@ -302,7 +317,8 @@ Resources: [...#Resource]
 					systems: [System]
 					#providers: Providers
 					#provisioners: Provisioners
-					xsolutions: []
+					xids: #xids + [_id]
+					xsolutions: #xsolutions
 					...
 					}).out & [...{resolved: true}]
              }
@@ -378,12 +394,15 @@ Resources: [...#Resource]
   #providers: [...#Provider]
   #provisioners: [...#Provisioner]
   xsolutions: [...]
+  xids: [...]
+  XIDS: [ for x in xsolutions { x._id }, for x in xids {x}]
   dependless_solutions:[ for s in [
     for xresource in (#dependlessResources & { #resources: xresources }).out
     for system in systems
     for provider in #providers
     for provisioner in #provisioners
-    {*(#Solution & { match:action: action, resource: close(xresource), System: close(system), #provider: close(provider), #provisioner: close(provisioner) }) | {resolved: false}}
+    if ! list.Contains( XIDS , (#solutionId & {#provider: provider, #provisioner: provisioner, #system: system, #resource: xresource}).out )
+        {*(#Solution & { #xsolutions: xsolutions, #xids: XIDS + [(#solutionId & {#provider: provider, #provisioner: provisioner, #system: system, #resource: xresource}).out], match:action: action, resource: close(xresource), System: close(system), #provider: close(provider), #provisioner: close(provisioner) }) | {resolved: false}}
   ] if s.resolved { s } ]
 
   // Resources that can't be satisfied with current known solutions
@@ -435,7 +454,8 @@ Resources: [...#Resource]
     for system in systems
     for provider in #providers
     for provisioner in #provisioners
-    {*(#Solution & { match:action: action, resource: xresource, System: system, #provider: provider, #provisioner: provisioner }) | {resolved: false}}
+    if ! list.Contains( XIDS , (#solutionId & {#provider: provider, #provisioner: provisioner, #system: system, #resource: xresource}).out )
+      {*(#Solution & { #xsolutions: xsolutions, #xids: XIDS, match:action: action, resource: xresource, System: system, #provider: provider, #provisioner: provisioner }) | {resolved: false}}
   ] if s.resolved { s }]
 
   // Recursion:
@@ -443,14 +463,15 @@ Resources: [...#Resource]
   Ssystems: systems
   Sproviders: #providers
   Sprovisioners: #provisioners
-  unresolved_solutions: [ for s in (*(#Solutions & {
+  unresolved_solutions: list.FlattenN([ if len(depended_unresolved) > 0 {[ for s in (*(#Solutions & {
     action: Saction
     xresources: depended_unresolved
     systems: Ssystems
     #providers: Sproviders
     #provisioners: Sprovisioners
     xsolutions: xsolutions + dependless_solutions + depended_resolved_solutions
-  }).out | []) if s.resolved { s } ]
+    ...
+  }).out | []) if s.resolved { s } ]} ], 2 )
   _ids: [for s in (xsolutions + dependless_solutions + depended_resolved_solutions) { s._id } ]
   unresolved_solutions_filtered: [ for s in unresolved_solutions if ! list.Contains(_ids, s._id) { s } ]
   out: xsolutions + dependless_solutions + depended_resolved_solutions + unresolved_solutions_filtered
