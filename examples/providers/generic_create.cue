@@ -1,4 +1,5 @@
 {
+    name: "Generic Explicit"
     type: "Example Resource Type"
     action: "create"
     system: {

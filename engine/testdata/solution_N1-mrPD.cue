@@ -1,23 +1,13 @@
 [[{
     name: "R(Minimal)S(Minimal)PD(Minimal)PR(Minimal)"
-    properties: {}
     provisioner: "example.sh"
     resource: {
         type: "Server"
         name: "Minimal"
-        properties: {}
-        solutions: []
-        dependencies: []
-        interfacesDependencies: []
-        enabledInterfaces: []
-        disabledInterfaces: []
-        dependedProperties: {}
     }
-    constrains: []
     system: {
         type: "Openstack"
         name: "Minimal"
-        properties: {}
     }
 }], [{
     name: "R(Minimal)S(Minimal)PD(Implicit2)PR(Minimal)"
@@ -28,13 +18,6 @@
             resource: {
                 type: "Server"
                 name: "Implicit"
-                properties: {}
-                solutions: []
-                dependencies: []
-                interfacesDependencies: []
-                enabledInterfaces: []
-                disabledInterfaces: []
-                dependedProperties: {}
             }
             solutions: [{
                 name:     "R(Implicit)S(Minimal)PD(Minimal)PR(Minimal)"
@@ -42,40 +25,47 @@
                 resource: {
                     type: "Server"
                     name: "Implicit"
-                    properties: {}
-                    solutions: []
-                    dependencies: []
-                    interfacesDependencies: []
-                    enabledInterfaces: []
-                    disabledInterfaces: []
-                    dependedProperties: {}
                 }
-                System: {
+                system: {
                     type: "Openstack"
                     name: "Minimal"
-                    properties: {}
                 }
-                match: {
-                    action: "create"
-                    type:   "Server"
-                    name:   "Minimal"
-                    system: {
-                        type: "Openstack"
-                        name: "Minimal"
-                        properties: {}
-                    }
-                    properties: {}
-                    implicit: {}
-                    interfaces: {}
-                    response: {}
-                    constrains: []
-                }
-                interfaces: {}
-                constrains: []
-                implicit: {}
-                joined: {}
                 provisioner: "example.sh"
-                properties: {}
+            }, {
+                name:     "R(Implicit)S(Minimal)PD(Implicit2)PR(Minimal)"
+                resolved: true
+                resource: {
+                    type: "Server"
+                    name: "Implicit"
+                }
+                system: {
+                    type: "Openstack"
+                    name: "Minimal"
+                }
+                provisioner: "example.sh"
+                properties: {
+                    name: [{
+                        resolved: true
+                        action:   "create"
+                        resource: {
+                            type: "Server"
+                            name: "Implicit"
+                        }
+                        solutions: [{
+                            name:     "R(Implicit)S(Minimal)PD(Minimal)PR(Minimal)"
+                            resolved: true
+                            resource: {
+                                type: "Server"
+                                name: "Implicit"
+                            }
+                            system: {
+                                type: "Openstack"
+                                name: "Minimal"
+                            }
+                            provisioner: "example.sh"
+                        }]
+                    }]
+                }
             }]
         }]
     }
@@ -83,18 +73,9 @@
     resource: {
         type: "Server"
         name: "Minimal"
-        properties: {}
-        solutions: []
-        dependencies: []
-        interfacesDependencies: []
-        enabledInterfaces: []
-        disabledInterfaces: []
-        dependedProperties: {}
     }
-    constrains: []
     system: {
         type: "Openstack"
         name: "Minimal"
-        properties: {}
     }
 }]]

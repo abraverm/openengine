@@ -212,7 +212,12 @@ func (e *Engine) Solutions(action string) (results string, err error) {
 		return string(instanceCue), xerrors.New(string(result))
 	}
 
-	return string(result), nil
+	reEmpty := regexp.MustCompile("(?m)[\r\n]+^.*: (\\[\\]|\\{\\}){1}")
+	empty := reEmpty.ReplaceAllString(string(result), "")
+	reSystem := regexp.MustCompile("(?m)System:")
+	res := reSystem.ReplaceAllString(empty, "system:")
+
+	return res, nil
 }
 
 // GetSpec return engine current specification for debugging.

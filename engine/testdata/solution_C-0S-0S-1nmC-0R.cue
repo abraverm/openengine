@@ -9,17 +9,9 @@
         properties: {
             name: "explicit"
         }
-        solutions: []
-        dependencies: []
-        interfacesDependencies: []
-        enabledInterfaces: []
-        disabledInterfaces: []
-        dependedProperties: {}
     }
-    constrains: []
     system: {
         type: "Openstack"
         name: "Minimal"
-        properties: {}
     }
 }]]

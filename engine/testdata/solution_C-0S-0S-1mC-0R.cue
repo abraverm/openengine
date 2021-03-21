@@ -9,21 +9,12 @@
         properties: {
             name: "explicit"
         }
-        solutions: []
-        dependencies: []
-        interfacesDependencies: []
-        enabledInterfaces: []
-        disabledInterfaces: []
-        dependedProperties: {}
     }
     constrains: [{
         name: "0S-0S-1nmC-0R"
-        pre: []
-        post: []
     }]
     system: {
         type: "Openstack"
         name: "Minimal"
-        properties: {}
     }
 }]]
