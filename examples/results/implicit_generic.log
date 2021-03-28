@@ -1,0 +1,104 @@
+level=info msg=[[{
+	name: "PD(Generic Implicit 1)"
+	properties: {
+		name: [{
+			resolved: true
+			script:   "to_upperscore"
+			args: {
+				a: "Example"
+			}
+		}]
+	}
+	provisioner: "example resource type provisioner"
+	resource: {
+		type: "Example Resource Type"
+	}
+	system: {
+		type: "Example Provider"
+		properties: {
+			name: "Example Provider Instance"
+		}
+	}
+}], [{
+	name: "PD(Generic Implicit 2)"
+	properties: {
+		name: [{
+			resolved: true
+			action:   "create"
+			resource: {
+				type: "Example Resource Type"
+				properties: {
+					name: "something"
+				}
+			}
+			solutions: [{
+				name:     "PD(Generic Explicit)"
+				resolved: true
+				resource: {
+					type: "Example Resource Type"
+					properties: {
+						name: "something"
+					}
+				}
+				system: {
+					type: "Example Provider"
+					properties: {
+						name: "Example Provider Instance"
+					}
+				}
+				provisioner: "example resource type provisioner"
+				properties: {
+					name: "something"
+				}
+			}, {
+				name:     "PD(Generic Implicit 1)"
+				resolved: true
+				resource: {
+					type: "Example Resource Type"
+					properties: {
+						name: "something"
+					}
+				}
+				system: {
+					type: "Example Provider"
+					properties: {
+						name: "Example Provider Instance"
+					}
+				}
+				provisioner: "example resource type provisioner"
+				properties: {
+					name: "something"
+				}
+			}, {
+				name:     "PD(Generic Implicit 2)"
+				resolved: true
+				resource: {
+					type: "Example Resource Type"
+					properties: {
+						name: "something"
+					}
+				}
+				system: {
+					type: "Example Provider"
+					properties: {
+						name: "Example Provider Instance"
+					}
+				}
+				provisioner: "example resource type provisioner"
+				properties: {
+					name: "something"
+				}
+			}]
+		}]
+	}
+	provisioner: "example resource type provisioner"
+	resource: {
+		type: "Example Resource Type"
+	}
+	system: {
+		type: "Example Provider"
+		properties: {
+			name: "Example Provider Instance"
+		}
+	}
+}]]

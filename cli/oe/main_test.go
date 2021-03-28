@@ -12,7 +12,7 @@ import (
 	"github.com/hexops/gotextdiff/span"
 )
 
-func Test_deploy(t *testing.T) {
+func Test_create(t *testing.T) {
 	tests := []struct {
 		name    string
 		dsl     string
@@ -22,7 +22,7 @@ func Test_deploy(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := create(tt.dsl, true)
+			err := op(tt.dsl, true, "create")
 			if fmt.Sprint(err) != fmt.Sprint(tt.wantErr) {
 				t.Errorf("CLI test %v of '%v' expected '%v' but got '%v'", tt.name, tt.dsl, tt.wantErr, err)
 			}
@@ -50,6 +50,12 @@ func Test_Examples(t *testing.T) {
 		{"explicit openstack", "getting_started_openstack.yaml", []step{{"create", "getting_started_openstack.log"}}},
 		{"explicit beaker", "getting_started_beaker.yaml", []step{{"create", "getting_started_beaker.log"}}},
 		{"implicit generic", "implicit_generic.yaml", []step{{"create", "implicit_generic.log"}}},
+		//		{"implicit aws os bkr", "implicit_aws_os_bkr.yaml", []step{{"create", "implicit_aws_os_bkr.log"}}}, // TODO: Fix memory leak
+		{"constrains generic", "constrains_generic.yaml", []step{{"create", "constrains_generic.log"}}},
+		{"constrains os resize", "constrains_os_resize.yaml", []step{{"update", "constrains_os_resize.log"}}},
+		{"explicit dependency generic", "dependencies_generic_explicit.yaml", []step{{"create", "dependencies_generic_explicit.log"}}},
+		{"implicit dependency generic", "dependencies_generic_implicit.yaml", []step{{"create", "dependencies_generic_implicit.log"}}},
+		{"dependencies os disk", "dependencies_os_disk.yaml", []step{{"create", "dependencies_os_disk.log"}}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -65,11 +71,11 @@ func Test_Examples(t *testing.T) {
 					t.Fatalf("Example %s failed on %s: %v", tt.name, s.action, e)
 				}
 				actual := readFile(logfile.Name())
-				expected := readFile(fmt.Sprintf("example_results/%s", s.result))
+				expected := readFile(fmt.Sprintf("examples/results/%s", s.result))
 
 				if actual != expected {
 					edits := myers.ComputeEdits(span.URIFromPath(logfile.Name()), actual, expected)
-					diffs := fmt.Sprint(gotextdiff.ToUnified(logfile.Name(), fmt.Sprintf("example_results/%s", s.result), actual, edits))
+					diffs := fmt.Sprint(gotextdiff.ToUnified(logfile.Name(), fmt.Sprintf("examples/results/%s", s.result), actual, edits))
 
 					// diffs := dmp.DiffMain(expected, actual, true)
 					t.Errorf("Example %s has different result than what was expected:\n%s", tt.name, diffs)

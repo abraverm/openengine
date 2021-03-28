@@ -199,23 +199,7 @@ Resources: [...#Resource]
   new: {
     type: *#resource.type | ""
     name: *#resource.name | ""
-    system: *#resource.system | {}
     properties: *#resource.properties | {}
-    dependencies: *#resource.dependencies | []
-    dependedProperties: *#resource.dependedProperties | {}
-    response: *#resource.response | {}
-    interfacesDependencies: *#resource.interfacesDependencies | []
-    enabledInterfaces: *#resource.enabledInterfaces | []
-    disabledInterfaces: *#resource.disabledInterfaces | []
-  }
-  out: (#structToHash & { #in: new }).out
-}
-
-#resourceToHash2: {
-  #in: {...}
-  new: {
-    type: *#in.type | ""
-    name: *#in.name | ""
   }
   out: (#structToHash & { #in: new }).out
 }
@@ -225,14 +209,6 @@ Resources: [...#Resource]
     #provisioner: {...}
     #system: {...}
     #resource: {...}
-//    provider_id: *(#structToHash & {#in: #provider}).out | ""
-//    provisioner_id: *(#structToHash & {#in: #provisioner}).out | ""
-//    system_id: *(#structToHash & {#in: #system}).out | ""
-//    resource_id: *(#resourceToHash & { #resource: #resource }).out | ""
-//    resource_id: *(#resourceToHash2 & { #in: #resource }).out | ""
-//    resource_id: *(#structToHash & { #in: #resource }).out | ""
-//    out: provider_id + provisioner_id + system_id + resource_id
-//    out: provider_id + provisioner_id + system_id
     out: #provider._id + #provisioner._id + #system._id + (#structToHash & { #in: #resource }).out
 }
 #Solution: {
@@ -292,7 +268,7 @@ Resources: [...#Resource]
 					#xids: #XIDS
 					xsolutions: #xsolutions
 					...
-					}).results & [...{resolved: true}]
+					}).out & [...{resolved: true}]
              }
             if (*task.script | "") != "" { task }
           }
@@ -312,7 +288,7 @@ Resources: [...#Resource]
 					#xids: #XIDS
 					xsolutions: #xsolutions
 					...
-					}).results & [...{resolved: true}]
+					}).out & [...{resolved: true}]
              }
             if (*task.script | "") != "" { task }
           }
@@ -625,8 +601,8 @@ ACTION: #Action
 #DecoupleGroup: {
   #set: [...]
   #resources: [...#Resource]
-  rids: [ for r in #resources { (#resourceToHash2 & { #in: r } ).out } ]
-  solutions: { for r in rids { "\(r)": [ for s in #set if (#resourceToHash2 & { #in: s.resource } ).out == r { s } ] } }
+  rids: [ for r in #resources { (#resourceToHash & { #resource: r } ).out } ]
+  solutions: { for r in rids { "\(r)": [ for s in #set if (#resourceToHash & { #resource: s.resource } ).out == r { s } ] } }
   combos: [ for combo in (#combo & { #input: solutions } ).out {[for n, s in combo { s } ]} ]
   out: [ for combo in combos if (#minimalSet & {#set: combo }).out {combo}]
 }

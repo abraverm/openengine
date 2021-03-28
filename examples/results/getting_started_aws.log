@@ -1,0 +1,22 @@
+level=info msg=[[{
+	name: ""
+	properties: {
+		MaxCount:     1
+		MinCount:     1
+		ImageId:      "ami-60a54009"
+		InstanceType: "m1.small"
+		KeyName:      "my-key-pair"
+	}
+	provisioner: "aws ec2 run-instances --image-id {{ ImageID }} --count {{ MaxCount }} --instance-type {{ InstanceType }} --key-name  {{ KeyName }}"
+	resource: {
+		type: "Server"
+		properties: {
+			ImageId:      "ami-60a54009"
+			InstanceType: "m1.small"
+			KeyName:      "my-key-pair"
+		}
+	}
+	system: {
+		type: "AWS"
+	}
+}]]

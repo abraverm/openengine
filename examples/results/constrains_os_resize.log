@@ -1,0 +1,81 @@
+level=info msg=[[{
+	name: ""
+	properties: {
+		name:      "Example"
+		flavorRef: "m1.large"
+	}
+	provisioner: "openstack server resize --flavor {{ flavorRef }} {{ name }}"
+	resource: {
+		type: "Server"
+		properties: {
+			flavorRef: "m1.large"
+			name:      "Example"
+		}
+	}
+	constrains: [{
+		name: "Resize constrain"
+		pre: [{
+			resolved: true
+			action:   "update"
+			resource: {
+				type: "Server"
+				properties: {
+					name: "Example"
+					stop: true
+				}
+			}
+			solutions: [{
+				name:     ""
+				resolved: true
+				resource: {
+					type: "Server"
+					properties: {
+						name: "Example"
+						stop: true
+					}
+				}
+				system: {
+					type: "Openstack"
+				}
+				provisioner: "openstack server stop {{ server_id }}"
+				properties: {
+					name: "Example"
+					stop: true
+				}
+			}]
+		}]
+		post: [{
+			resolved: true
+			action:   "update"
+			resource: {
+				type: "Server"
+				properties: {
+					name:  "Example"
+					start: true
+				}
+			}
+			solutions: [{
+				name:     ""
+				resolved: true
+				resource: {
+					type: "Server"
+					properties: {
+						name:  "Example"
+						start: true
+					}
+				}
+				system: {
+					type: "Openstack"
+				}
+				provisioner: "openstack server start {{ server_id }}"
+				properties: {
+					name:  "Example"
+					start: true
+				}
+			}]
+		}]
+	}]
+	system: {
+		type: "Openstack"
+	}
+}]]

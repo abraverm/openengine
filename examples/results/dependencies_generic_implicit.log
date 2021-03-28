@@ -1,0 +1,58 @@
+level=info msg=[[{
+	name: "R(a)"
+	provisioner: "response.sh"
+	resource: {
+		type: "Example Resource Response Type"
+		name: "a"
+	}
+	system: {
+		type: "Example Provider"
+	}
+}, {
+	name: "R(b)"
+	properties: {
+		example: {
+			response: {
+				other: ""
+			}
+			action: "create"
+			name:   "Resolved from Example Resource Response Type"
+			type:   "Example Resource Response Type"
+			field:  "other"
+			solution: {
+				name: "R(a)"
+				resource: {
+					type: "Example Resource Response Type"
+					name: "a"
+				}
+				system: {
+					type: "Example Provider"
+				}
+				provisioner: "response.sh"
+				resolved: true
+			}
+		}
+	}
+	provisioner: "interface.sh"
+	resource: {
+		type: "Example Resource Interface Type"
+		name: "b"
+		solutions: [{
+			name: "R(a)"
+			resource: {
+				type: "Example Resource Response Type"
+				name: "a"
+			}
+			system: {
+				type: "Example Provider"
+			}
+			provisioner: "response.sh"
+			resolved: true
+		}]
+		dependencies: ["a"]
+		interfacesDependencies: ["a"]
+	}
+	system: {
+		type: "Example Provider"
+	}
+}]]

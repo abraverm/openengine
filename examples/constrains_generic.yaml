@@ -1,0 +1,11 @@
+---
+provisioners:
+  - provisioners/generic_create.cue
+providers:
+  - providers/generic_constrains.cue
+systems:
+  - type: Example Provider
+resources:
+  - type: Example Resource Type
+    properties:
+      name: Example Resource

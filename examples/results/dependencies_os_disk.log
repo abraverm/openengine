@@ -1,0 +1,75 @@
+level=info msg=[[{
+	name: ""
+	properties: {
+		volume: {
+			response: {
+				id: ""
+			}
+			action: "create"
+			name:   "Resolved from depended volume"
+			type:   "Volume"
+			field:  "id"
+			solution: {
+				name: "R(custom volume)"
+				resource: {
+					type: "Volume"
+					name: "custom volume"
+					properties: {
+						size: "10g"
+					}
+				}
+				system: {
+					type: "Openstack"
+				}
+				provisioner: "openstack volume create --size {{ size }}"
+				properties: {
+					size: "10g"
+				}
+				resolved: true
+			}
+		}
+	}
+	provisioner: "openstack server create --volume {{ volume }}"
+	resource: {
+		type: "Server"
+		solutions: [{
+			name: "R(custom volume)"
+			resource: {
+				type: "Volume"
+				name: "custom volume"
+				properties: {
+					size: "10g"
+				}
+			}
+			system: {
+				type: "Openstack"
+			}
+			provisioner: "openstack volume create --size {{ size }}"
+			properties: {
+				size: "10g"
+			}
+			resolved: true
+		}]
+		dependencies: ["custom volume"]
+		interfacesDependencies: ["custom volume"]
+	}
+	system: {
+		type: "Openstack"
+	}
+}, {
+	name: "R(custom volume)"
+	properties: {
+		size: "10g"
+	}
+	provisioner: "openstack volume create --size {{ size }}"
+	resource: {
+		type: "Volume"
+		name: "custom volume"
+		properties: {
+			size: "10g"
+		}
+	}
+	system: {
+		type: "Openstack"
+	}
+}]]

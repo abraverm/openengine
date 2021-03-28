@@ -75,7 +75,6 @@ func TestEngine_AddSystem(t *testing.T) {
 		system  System
 		wantErr bool
 	}{
-		{"empty", System{}, false},
 		{"minimal", System{Type: "Openstack"}, false},
 		{"with args", System{Type: "Openstack", Properties: map[string]interface{}{"key": "value"}}, false},
 	}
@@ -124,7 +123,7 @@ func TestEngine_addObject(t *testing.T) {
 	}{
 		{"empty", "", "", true},
 		{"bad object", "", "Resource", true},
-		{"good object", Resource{"Server", P{"key": "value"}, nil}, "Resource", false},
+		{"good object", Resource{"Server", "", P{"key": "value"}, System{"", P{}}, []string{}, []string{}}, "Resource", false},
 		{"bad definition", struct{ Bad string }{Bad: "test"}, "Provider", true},
 	}
 	for i, tt := range tests {

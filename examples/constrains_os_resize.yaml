@@ -1,0 +1,16 @@
+---
+provisioners:
+  - provisioners/openstack_server_resize.cue
+  - provisioners/openstack_server_start.cue
+  - provisioners/openstack_server_stop.cue
+providers:
+  - providers/openstack_server_resize.cue
+  - providers/openstack_server_stop.cue
+  - providers/openstack_server_start.cue
+systems:
+  - type: Openstack
+resources:
+  - type: Server
+    properties:
+      name: Example
+      flavorRef: m1.large

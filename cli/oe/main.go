@@ -42,7 +42,7 @@ func initLogger(path string, debug, verbose bool) {
 	}
 }
 
-func create(path string, noop bool) error {
+func op(path string, noop bool, opType string) error {
 	filename, _ := filepath.Abs(path)
 
 	base := filepath.Dir(filename)
@@ -60,7 +60,7 @@ func create(path string, noop bool) error {
 
 	e := createEngine(c, base)
 
-	solutions, err := e.Solutions("create")
+	solutions, err := e.Solutions(opType)
 	if err != nil {
 		return fmt.Errorf("engine failure: %w", err)
 	}
@@ -134,7 +134,52 @@ func run(args []string) error {
 				}
 				initLogger(c.String("log"), c.Bool("debug"), c.Bool("verbose"))
 
-				return create(c.Args().Get(0), c.Bool("noop"))
+				return op(c.Args().Get(0), c.Bool("noop"), "create")
+			},
+		},
+		{
+			Name:  "delete",
+			Usage: "Delete resources",
+			Description: "Delete command will parse the DSL file, " +
+				"resolve definitions and other requirements to delete requested resources",
+			Before: altsrc.InitInputSourceWithContext(flags, altsrc.NewYamlSourceFromFlagFunc("config")),
+			Action: func(c *cli.Context) error {
+				if c.NArg() == 0 {
+					return xerrors.Errorf("no DSL file was provided (argument)")
+				}
+				initLogger(c.String("log"), c.Bool("debug"), c.Bool("verbose"))
+
+				return op(c.Args().Get(0), c.Bool("noop"), "delete")
+			},
+		},
+		{
+			Name:  "update",
+			Usage: "Update resources",
+			Description: "Update command will parse the DSL file, " +
+				"resolve definitions and other requirements to update requested resources",
+			Before: altsrc.InitInputSourceWithContext(flags, altsrc.NewYamlSourceFromFlagFunc("config")),
+			Action: func(c *cli.Context) error {
+				if c.NArg() == 0 {
+					return xerrors.Errorf("no DSL file was provided (argument)")
+				}
+				initLogger(c.String("log"), c.Bool("debug"), c.Bool("verbose"))
+
+				return op(c.Args().Get(0), c.Bool("noop"), "update")
+			},
+		},
+		{
+			Name:  "read",
+			Usage: "Get resources",
+			Description: "Read/get command will parse the DSL file, " +
+				"resolve definitions and other requirements to get requested resources",
+			Before: altsrc.InitInputSourceWithContext(flags, altsrc.NewYamlSourceFromFlagFunc("config")),
+			Action: func(c *cli.Context) error {
+				if c.NArg() == 0 {
+					return xerrors.Errorf("no DSL file was provided (argument)")
+				}
+				initLogger(c.String("log"), c.Bool("debug"), c.Bool("verbose"))
+
+				return op(c.Args().Get(0), c.Bool("noop"), "read")
 			},
 		},
 	}

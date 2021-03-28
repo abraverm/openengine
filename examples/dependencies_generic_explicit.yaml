@@ -1,0 +1,17 @@
+---
+providers:
+  - providers/generic_create.cue
+provisioners:
+  - provisioners/generic_create.cue
+systems:
+  - type: Example Provider
+resources:
+  - type: Example Resource Type
+    name: a
+    properties:
+      name: Example Resource A
+  - type: Example Resource Type
+    name: b
+    properties:
+      name: Example Resource B
+    dependencies: ["a"]
