@@ -1,0 +1,194 @@
+level=info msg=[[{
+	name: ""
+	properties: {
+		MaxCount: 1
+		MinCount: 1
+		ImageId: [{
+			resolved: true
+			action:   "read"
+			resource: {
+				type: "DescribeImages"
+				properties: {
+					name: "fedora"
+				}
+			}
+			solutions: [{
+				name:     ""
+				resolved: true
+				resource: {
+					type: "DescribeImages"
+					properties: {
+						name: "fedora"
+					}
+				}
+				system: {
+					type: "AWS"
+				}
+				provisioner: "curl https://ec2.amazonaws.com/?Action=DescribeImages&Filter.1.Name=name&Filter.1.Value.1={{ name }}"
+				properties: {
+					name: "fedora"
+				}
+			}]
+		}, {
+			resolved: true
+			script:   "first_image"
+		}]
+		InstanceType: [{
+			resolved: true
+			script:   "aws_flavor"
+			args: {
+				flavor: "8g"
+			}
+		}]
+	}
+	provisioner: "aws ec2 run-instances --image-id {{ ImageID }} --count {{ MaxCount }} --instance-type {{ InstanceType }} --key-name  {{ KeyName }}"
+	resource: {
+		type: "Server"
+	}
+	system: {
+		type: "AWS"
+	}
+}], [{
+	name: ""
+	properties: {
+		method:    "nfs"
+		arch:      "x86_64"
+		memory_op: ">="
+		name: [{
+			resolved: true
+			script:   "random"
+		}]
+		family: [{
+			resolved: true
+			script:   "create_string"
+			args: {
+				value:    "fedora"
+				template: ".*{{ value }}.*"
+			}
+		}, {
+			resolved: true
+			action:   "read"
+			resource: {
+				type: "Distro"
+				properties: {
+					name: "{{ result }}"
+				}
+			}
+			solutions: [{
+				name:     ""
+				resolved: true
+				resource: {
+					type: "Distro"
+					properties: {
+						name: "{{ result }}"
+					}
+				}
+				system: {
+					type: "Beaker"
+				}
+				provisioner: "bkr distros-list --name {{ name }}"
+				properties: {
+					name: "{{ result }}"
+				}
+			}]
+		}, {
+			resolved: true
+			script:   "bkr_list_distro_to_family.sh"
+		}]
+		memory: [{
+			resolved: true
+			script:   "convert_to_mb"
+			args: {
+				value: "8g"
+			}
+		}]
+	}
+	provisioner: "generate_xml {{ name }} {{ family }} {{ method }} {{ arch }} && bkr job-submit --wait my-beaker-job.xml"
+	resource: {
+		type: "Server"
+	}
+	system: {
+		type: "Beaker"
+	}
+}], [{
+	name: ""
+	properties: {
+		name: [{
+			resolved: true
+			script:   "random"
+		}]
+		flavorRef: [{
+			resolved: true
+			script:   "convert_to_mb"
+			args: {
+				value: "8g"
+			}
+		}, {
+			resolved: true
+			action:   "read"
+			resource: {
+				type: "Flavor"
+				properties: {
+					minRam: "{{ result }}"
+				}
+			}
+			solutions: [{
+				name:     ""
+				resolved: true
+				resource: {
+					type: "Flavor"
+					properties: {
+						minRam: "{{ result }}"
+					}
+				}
+				system: {
+					type: "Openstack"
+				}
+				provisioner: "openstack flavor get --minram {{ minRam }}"
+				properties: {
+					minRam: "{{ result }}"
+				}
+			}]
+		}, {
+			resolved: true
+			script:   "first_flavor"
+		}]
+		imageRef: [{
+			resolved: true
+			action:   "read"
+			resource: {
+				type: "Image"
+				properties: {
+					name: "fedora"
+				}
+			}
+			solutions: [{
+				name:     ""
+				resolved: true
+				resource: {
+					type: "Image"
+					properties: {
+						name: "fedora"
+					}
+				}
+				system: {
+					type: "Openstack"
+				}
+				provisioner: "openstack image get --name {{ name }}"
+				properties: {
+					name: "fedora"
+				}
+			}]
+		}, {
+			resolved: true
+			script:   "first_image"
+		}]
+	}
+	provisioner: "openstack server create --image {{ imageRef }} --flavor  {{ flavorRef }} {{ name }}"
+	resource: {
+		type: "Server"
+	}
+	system: {
+		type: "Openstack"
+	}
+}]]

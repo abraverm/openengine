@@ -1,0 +1,15 @@
+---
+providers:
+  - providers/generic_interface.cue
+  - providers/generic_response.cue
+provisioners:
+  - provisioners/generic_interface.cue
+  - provisioners/generic_response.cue
+systems:
+  - type: Example Provider
+resources:
+  - type: Example Resource Response Type
+    name: a
+  - type: Example Resource Interface Type
+    name: b
+    interfacesDependencies: ["a"]

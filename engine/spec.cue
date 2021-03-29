@@ -81,6 +81,7 @@ import "strings"
 #System: {
   type: #Type
   name?: string
+  _id: string
   properties: #Properties
 }
 
@@ -110,6 +111,7 @@ import "strings"
 #Provider: {
   type: #Type
   name?: string
+  _id: string
   action: #Action
   system: #System
   properties: #Properties
@@ -174,6 +176,7 @@ import "strings"
 #Provisioner: {
   type: #Type
   name?: string
+  _id: string
   action: #Action
   system: #System
   properties: #Properties
@@ -194,46 +197,49 @@ Resources: [...#Resource]
 #resourceToHash: {
   #resource: #Resource
   new: {
-    type: #resource.type
+    type: *#resource.type | ""
     name: *#resource.name | ""
-    system: *#resource.system | {}
-    properties: #resource.properties
-    dependencies: #resource.dependencies
-    dependedProperties: #resource.dependedProperties
-    response: *#resource.response | {}
-    interfacesDependencies: #resource.interfacesDependencies
-    enabledInterfaces: #resource.enabledInterfaces
-    disabledInterfaces: #resource.disabledInterfaces
+    properties: *#resource.properties | {}
   }
   out: (#structToHash & { #in: new }).out
 }
 
+#solutionId: {
+    #provider: {...}
+    #provisioner: {...}
+    #system: {...}
+    #resource: {...}
+    out: #provider._id + #provisioner._id + #system._id + (#structToHash & { #in: #resource }).out
+}
 #Solution: {
   name: (*("R("+resource.name + ")")| "" ) + (*("S("+System.name+")")| "" ) + (*("PD("+#provider.name+")")| "" ) + (*("PR("+#provisioner.name+")")| "" )
-  _id: (#structToHash & {#in: #provider}).out + (#structToHash & {#in: #provisioner}).out + (#structToHash & {#in: System}).out + (#resourceToHash & { #resource: resource }).out
+  _id: #provider._id + #provisioner._id + System._id + (#structToHash & { #in: resource }).out
   #provider: #Provider
   #provisioner: #Provisioner
   resource: #Resource
   System: #System
+  #xids: [...]
+  #XIDS: [_id] + #xids
+  #xsolutions: [...]
   #provisioner: properties: { ... }
   resource: properties: { ... }
-  match: *(#provider & {
+  _match: *(#provider & {
     system: #provisioner.system & System & (resource.system | { ... })
     type: (resource.type & #provisioner.type) | null
     properties: resource.properties & #provisioner.properties
     response: #provisioner.response & (*resource.response | { ... })
   }) | { action: string | *"" }
   interfaces: {
-    for param, options in (*match.interfaces | [] ){
+    for param, options in (*_match.interfaces | [] ){
       "\(param)": [ for i in [
         for o in options
         for s in resource.solutions
         {
           *{
-            response: { for p, v in o.response { "\(p)": *(v & s.match.response[p]) | null } }
-            action: s.match.action & o.action
+            response: { for p, v in o.response { "\(p)": *(v & s._match.response[p]) | null } }
+            action: s._match.action & o.action
 			name: o.name
-			type: s.match.type & o.type
+			type: s._match.type & o.type
             field: o.field
             solution: s
           } | null
@@ -242,9 +248,9 @@ Resources: [...#Resource]
     }
   }
   constrains: [ for x in [
-    for c in (*match.constrains | [] ) if ( *{
-       conditions: close(match.properties) & close({ for p, v in c.properties  {"\(p)": v & match.properties[p]}})
-       response: close(match.response) & close({ for p, v in c.response  {"\(p)": v & match.response[p]}})
+    for c in (*_match.constrains | [] ) if ( *{
+       conditions: close(_match.properties) & close({ for p, v in c.properties  {"\(p)": v & _match.properties[p]}})
+       response: close(_match.response) & close({ for p, v in c.response  {"\(p)": v & _match.response[p]}})
      } | null) != null {
         name: c.name
         pre: ([
@@ -259,7 +265,8 @@ Resources: [...#Resource]
 					systems: [System]
 					#providers: Providers
 					#provisioners: Provisioners
-					xsolutions: []
+					#xids: #XIDS
+					xsolutions: #xsolutions
 					...
 					}).out & [...{resolved: true}]
              }
@@ -278,7 +285,8 @@ Resources: [...#Resource]
 					systems: [System]
 					#providers: Providers
 					#provisioners: Provisioners
-					xsolutions: []
+					#xids: #XIDS
+					xsolutions: #xsolutions
 					...
 					}).out & [...{resolved: true}]
              }
@@ -288,8 +296,8 @@ Resources: [...#Resource]
        }
     ] if (x.pre != null && x.post != null) || true { x }
   ]
-  implicit: {
-     for param, workflow in (*match.implicit| []) {
+  _implicit: {
+     for param, workflow in (*_match.implicit| []) {
 		"\(param)": *([
           for task in workflow {
              if (*task.action | "") != "" {
@@ -302,7 +310,8 @@ Resources: [...#Resource]
 					systems: [System]
 					#providers: Providers
 					#provisioners: Provisioners
-					xsolutions: []
+					#xids: #XIDS
+					xsolutions: #xsolutions
 					...
 					}).out & [...{resolved: true}]
              }
@@ -311,14 +320,14 @@ Resources: [...#Resource]
         ] & [...{resolved: true}] ) | null
      }
   }
-  joined: {
-    for x, y in (*match.properties | [] ) { "\(x)":explicit: y }
-    for x, y in implicit if (*resource.dependedProperties[x]| null) == null && len(interfaces[x] | []) == 0 {"\(x)":implicit: y }
+  _joined: {
+    for x, y in (*_match.properties | [] ) { "\(x)":explicit: y }
+    for x, y in _implicit if (*resource.dependedProperties[x]| null) == null && len(interfaces[x] | []) == 0 {"\(x)":implicit: y }
     for x, y in interfaces if len(y) > 0 {"\(x)":interface: *y[0] | null }
   }
   provisioner: #provisioner.provisioner
   properties: {
-    for x, y in joined {
+    for x, y in _joined {
       if y.explicit != null { "\(x)": y.explicit }
       if y.explicit == null {
         if (*y.interface | null) != null { "\(x)": y.interface }
@@ -329,7 +338,7 @@ Resources: [...#Resource]
       }
     }
   }
-  resolved: len([for p in properties if p == null {null}]) == 0 && len(match) > 1
+  resolved: len([for p in properties if p == null {null}]) == 0 && len(_match) > 1
 }
 
 #dependlessResources: {
@@ -378,12 +387,15 @@ Resources: [...#Resource]
   #providers: [...#Provider]
   #provisioners: [...#Provisioner]
   xsolutions: [...]
+  #xids: [...]
+  #XIDS: [ for x in xsolutions { x._id }, for x in #xids {x}]
   dependless_solutions:[ for s in [
     for xresource in (#dependlessResources & { #resources: xresources }).out
     for system in systems
     for provider in #providers
     for provisioner in #provisioners
-    {*(#Solution & { match:action: action, resource: close(xresource), System: close(system), #provider: close(provider), #provisioner: close(provisioner) }) | {resolved: false}}
+    if ! list.Contains( #XIDS , (#solutionId & {#provider: provider, #provisioner: provisioner, #system: system, #resource: xresource}).out )
+        {*(#Solution & { #xsolutions: xsolutions, #xids: #XIDS, _match:action: action, resource: close(xresource), System: close(system), #provider: close(provider), #provisioner: close(provisioner) }) | {resolved: false}}
   ] if s.resolved { s } ]
 
   // Resources that can't be satisfied with current known solutions
@@ -407,9 +419,9 @@ Resources: [...#Resource]
       _id: s._id
       resource: s.resource
       System: s.System
-      match: s.match
-      implicit: s.implicit
-      joined: s.joined
+      _match: s._match
+      _implicit: s._implicit
+      _joined: s._joined
       provisioner: s.provisioner
       properties: s.properties
       resolved: s.resolved
@@ -435,7 +447,8 @@ Resources: [...#Resource]
     for system in systems
     for provider in #providers
     for provisioner in #provisioners
-    {*(#Solution & { match:action: action, resource: xresource, System: system, #provider: provider, #provisioner: provisioner }) | {resolved: false}}
+    if ! list.Contains( #XIDS , (#solutionId & {#provider: provider, #provisioner: provisioner, #system: system, #resource: xresource}).out )
+      {*(#Solution & { #xsolutions: xsolutions, #xids: #XIDS, _match:action: action, resource: xresource, System: system, #provider: provider, #provisioner: provisioner }) | {resolved: false}}
   ] if s.resolved { s }]
 
   // Recursion:
@@ -443,28 +456,29 @@ Resources: [...#Resource]
   Ssystems: systems
   Sproviders: #providers
   Sprovisioners: #provisioners
-  unresolved_solutions: [ for s in (*(#Solutions & {
+  unresolved_solutions: list.FlattenN([ if len(depended_unresolved) > 0 {[ for s in (*(#Solutions & {
     action: Saction
     xresources: depended_unresolved
     systems: Ssystems
     #providers: Sproviders
     #provisioners: Sprovisioners
     xsolutions: xsolutions + dependless_solutions + depended_resolved_solutions
-  }).out | []) if s.resolved { s } ]
-  _ids: [for s in (xsolutions + dependless_solutions + depended_resolved_solutions) { s._id } ]
-  unresolved_solutions_filtered: [ for s in unresolved_solutions if ! list.Contains(_ids, s._id) { s } ]
+    ...
+  }).out | []) if s.resolved { s } ]} ], 2 )
+  ids: [for s in (xsolutions + dependless_solutions + depended_resolved_solutions) { s._id } ]
+  unresolved_solutions_filtered: [ for s in unresolved_solutions if ! list.Contains(ids, s._id) { s } ]
   out: xsolutions + dependless_solutions + depended_resolved_solutions + unresolved_solutions_filtered
   implicit_workaround: [ for i in out {*( {
     name: i.name
     _id: i._id
-    properties: i.properties
+    properties: i.properties & { ... }
 	provisioner: i.provisioner
     resolved: i.resolved
     constrains: i.constrains
 	resource: i.resource
 	system: i.System
-    joined: i.joined
-  }& { joined:[string]:implicit: [...{ solutions?: [{...}, ...], ...}], ...}) | null}]
+    _joined: i._joined
+  }& { _joined:[string]:implicit: [...{ solutions?: [{...}, ...], ...}], ...}) | null}]
   results: [ for o in implicit_workaround if o != null {
     name: o.name
     _id: o._id
@@ -494,17 +508,16 @@ Resources: [...#Resource]
 resources:[string]:#Resource
 Resources: [ for _, r in resources { r } ]
 systems:[string]:#System
-Systems: [ for _, s in systems { s } ]
+Systems: [ for i, s in systems { s & { _id: i }} ]
 providers:[string]:#Provider
-Providers: [ for _, p in providers { p } ]
+Providers: [ for i, p in providers { p & { _id: i } } ]
 provisioners:[string]:#Provisioner
-Provisioners: [ for _, p in provisioners { p } ]
+Provisioners: [ for i, p in provisioners { p & { _id: i } } ]
 
 #FlattenUniqueGroup: {
-  input: [...[...string]]
-  flatten: list.FlattenN(input, 2)
+  input: [...]
   unique: { ... }
-  { for i in flatten { unique:"\(i)":1 } }
+  { for i in input { unique:"\(i)":1 } }
   out: list.SortStrings([ for v, _ in unique { v } ])
 }
 
@@ -513,7 +526,7 @@ Provisioners: [ for _, p in provisioners { p } ]
   start: list.SortStrings(*input[0] | [])
   others: *input[1:] | []
   start_matching: [ for other in others if ! list.UniqueItems(list.SortStrings(other + start)) { other } ] + [start]
-  matched: *(#FlattenUniqueGroup & { input: [for s in start_matching { [for x in s  {x} ] } ]}).out | []
+  matched: *(#FlattenUniqueGroup & { input: list.FlattenN([for s in start_matching { [for x in s  {x} ] } ], 2)}).out | []
   not_matched: [ for other in others if list.UniqueItems(list.SortStrings(other + start)) { other } ]
   next: [matched] + not_matched
   complete_start: list.FlattenN([ for c in [
@@ -575,13 +588,13 @@ ACTION: #Action
     [for s in #solution.resource.solutions { s._id }],
     for s in #solution.resource.solutions { *(#getDependencySolutionsIds & { #solution: s }).out | []}
   ]
-  out: (#FlattenUniqueGroup & { input: ids }).out
+  out: (#FlattenUniqueGroup & { input: [ for id in list.FlattenN(ids ,2) if len(id) >= 24 {id} ] }).out
 }
 
 #minimalSet: {
   #set: [...]
   base: [ for s in #set { s._id } ]
-  full: (#FlattenUniqueGroup & { input: [ for s in #set { (#getDependencySolutionsIds & { #solution: s } ).out} ]}).out
+  full: (#FlattenUniqueGroup & {input: list.FlattenN([ for s in #set { (#getDependencySolutionsIds & { #solution: s } ).out} ], 2)}).out
   out: len(base) == len(full)
 }
 
@@ -601,7 +614,8 @@ DependencyGroupsSolutionsDecoupled: list.FlattenN([
  		  for c in (#DecoupleGroup & { #set: set, #resources: #DependencyGroups[gid], ... }).out if len(c) > 0 {[
 			for s in c{
               name: s.name
-              properties: s.properties & {...}
+              _id: s._id
+              properties: s.properties
               provisioner: s.provisioner
               resource: s.resource
               constrains: s.constrains

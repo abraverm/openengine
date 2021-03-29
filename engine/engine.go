@@ -1,4 +1,5 @@
 // Package engine is the core of OpenEngine that generates solutions
+// nolint: wrapcheck
 package engine
 
 import (
@@ -10,6 +11,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"regexp"
 	"strings"
 
 	"cuelang.org/go/cue"
@@ -137,38 +139,44 @@ func (e *Engine) Add(path, def, content string) error {
 		return xerrors.New("Content is empty")
 	}
 
+	re := regexp.MustCompile(`"_(.*)":`)
+	content = re.ReplaceAllString(content, "_${1}:")
+
 	defType := fmt.Sprintf("#%s", def)
 	if err := e.validateRaw(path, defType, content); err != nil {
 		return err
 	}
 
 	h := sha256.New()
-	h.Write([]byte(content)) // nolint: errcheck, gosec
+	h.Write([]byte(content)) // nolint: gosec
 	sha := hex.EncodeToString(h.Sum(nil))
 	source := fmt.Sprintf("\n%ss:\"%s\":%s\n", strings.ToLower(def), sha, content)
-	e.addDefinition(path, source) // nolint: errcheck, gosec
 
-	return nil
+	return e.addDefinition(path, source)
 }
 
 // System is a provider instance that contains matching values and other metadata such as credentials.
 type System struct {
-	Type       string                 `json:"type"`
+	Type       string                 `json:"type,omitempty"`
 	Properties map[string]interface{} `json:"properties"`
 }
 
 // Resource is the user requested resource with its type and parameters.
 type Resource struct {
-	Name         string                 `json:"type"`
-	Properties   map[string]interface{} `json:"properties"`
-	Dependencies map[string]interface{}
+	Type                   string                 `json:"type"`
+	Name                   string                 `json:"name,omitempty"`
+	Properties             map[string]interface{} `json:"properties"`
+	System                 System                 `json:"system,omitempty"`
+	Dependencies           []string               `json:"dependencies,omitempty"`
+	InterfacesDependencies []string               `json:"interfacesDependencies,omitempty"`
 }
 
-func (e Engine) addObject(obj interface{}, def string) error {
+func (e *Engine) addObject(obj interface{}, def string) error {
 	defType := fmt.Sprintf("#%s", def)
 	defValue := e.cue.instance.LookupDef(defType)
 
 	objValue, _ := e.cue.codec.Decode(obj)
+
 	if err := defValue.Unify(objValue).Validate(); err != nil {
 		return fmt.Errorf("failed validation: %w", err)
 	}
@@ -208,5 +216,15 @@ func (e *Engine) Solutions(action string) (results string, err error) {
 		return string(instanceCue), xerrors.New(string(result))
 	}
 
-	return string(result), nil
+	reEmpty := regexp.MustCompile("(?m)[\r\n]+^.*: (\\[]|{})")
+	empty := reEmpty.ReplaceAllString(string(result), "")
+	reSystem := regexp.MustCompile("(?m)System:")
+	res := reSystem.ReplaceAllString(empty, "system:")
+
+	return res, nil
+}
+
+// GetSpec return engine current specification for debugging.
+func (e Engine) GetSpec() string {
+	return e.cue.spec
 }

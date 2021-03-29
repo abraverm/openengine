@@ -1,0 +1,25 @@
+level=info msg=[[{
+	name: ""
+	properties: {
+		name:   "example_server_name"
+		family: "rhel75"
+		method: "nfs"
+		arch:   "x86_64"
+	}
+	provisioner: "generate_xml {{ name }} {{ family }} {{ method }} {{ arch }} && bkr job-submit --wait my-beaker-job.xml"
+	resource: {
+		type: "Server"
+		properties: {
+			arch:   "x86_64"
+			family: "rhel75"
+			method: "nfs"
+			name:   "example_server_name"
+		}
+	}
+	system: {
+		type: "Beaker"
+		properties: {
+			version: 25
+		}
+	}
+}]]

@@ -1,7 +1,0 @@
-#!/bin/bash
-networks="$(openstack --os-cloud=openstack network list --enable --external -c Name -f value)"
-availableip="$(mktemp)"
-openstack --os-cloud=openstack ip availability list -f json > $availableip
-echo $networks | tr " " "\n" | xargs -n1 -I '{}' jq '.[] | select(."Network Name" == "{}")' $availableip | jq -s '.'
-# rm -rf $availableip
-exit 0

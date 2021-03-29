@@ -1,6 +1,5 @@
 [[{
     name: "R(1e1i0o)S(Minimal)PD(Mixed)PR(Mixed)"
-    constrains: [],
     properties: {
         name: [{
             script: "something"
@@ -18,16 +17,9 @@
         properties: {
             disk: "10g"
         }
-        solutions: []
-        dependencies: []
-        interfacesDependencies: []
-        enabledInterfaces: []
-        disabledInterfaces: []
-        dependedProperties: {}
     }
     system: {
         type: "Openstack"
         name: "Minimal"
-        properties: {}
     }
 }]]

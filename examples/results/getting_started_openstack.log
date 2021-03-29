@@ -1,0 +1,23 @@
+level=info msg=[[{
+	name: ""
+	properties: {
+		name:      "example_server_name"
+		flavorRef: "m1.small"
+		imageRef:  "fedora31"
+	}
+	provisioner: "openstack server create --image {{ imageRef }} --flavor  {{ flavorRef }} {{ name }}"
+	resource: {
+		type: "Server"
+		properties: {
+			flavorRef: "m1.small"
+			imageRef:  "fedora31"
+			name:      "example_server_name"
+		}
+	}
+	system: {
+		type: "Openstack"
+		properties: {
+			nova: 2.2
+		}
+	}
+}]]

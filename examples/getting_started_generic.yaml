@@ -1,0 +1,13 @@
+---
+provisioners:
+  - provisioners/generic_create.cue
+providers:
+  - providers/generic_create.cue
+systems:
+  - type: Example Provider
+    properties:
+      name: Example Provider Instance
+resources:
+  - type: Example Resource Type
+    properties:
+      name: example of explicit value

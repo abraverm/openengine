@@ -1,0 +1,27 @@
+level=info msg=[[{
+	name: "PD(Generic Explicit)"
+	properties: {
+		name: "Example Resource"
+	}
+	provisioner: "example resource type provisioner"
+	resource: {
+		type: "Example Resource Type"
+		properties: {
+			name: "Example Resource"
+		}
+	}
+	constrains: [{
+		name: "Example of active constrain"
+		pre: [{
+			resolved: true
+			script:   "pre.sh"
+		}]
+		post: [{
+			resolved: true
+			script:   "post.sh"
+		}]
+	}]
+	system: {
+		type: "Example Provider"
+	}
+}]]

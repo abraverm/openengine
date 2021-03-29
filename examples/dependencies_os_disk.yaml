@@ -1,0 +1,16 @@
+---
+providers:
+  - providers/openstack_server_interface_create.cue
+  - providers/openstack_volume_create.cue
+provisioners:
+  - provisioners/openstack_server_interface_create.cue
+  - provisioners/openstack_volume_create.cue
+systems:
+  - type: Openstack
+resources:
+  - type: Server
+    interfacesDependencies: ["custom volume"]
+  - type: Volume
+    name: "custom volume"
+    properties:
+      size: 10g

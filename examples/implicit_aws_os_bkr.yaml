@@ -1,0 +1,26 @@
+---
+provisioners:
+  - provisioners/aws_server_create.cue
+  - provisioners/aws_describe_images_read.cue
+  - provisioners/beaker_server_implicit_create.cue
+  - provisioners/beaker_distro_read.cue
+  - provisioners/openstack_server_create.cue
+  - provisioners/openstack_flavor_read.cue
+  - provisioners/openstack_image_read.cue
+providers:
+  - providers/aws_implicit_server_create.cue
+  - providers/aws_describe_images_read.cue
+  - providers/beaker_implicit_server_create.cue
+  - providers/beaker_distro_read.cue
+  - providers/openstack_implicit_server_create.cue
+  - providers/openstack_flavor_read.cue
+  - providers/openstack_image_read.cue
+systems:
+  - type: AWS
+  - type: Beaker
+  - type: Openstack
+resources:
+  - type: Server
+    properties:
+      _memory: 8g
+      _image: fedora

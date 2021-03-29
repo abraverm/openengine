@@ -1,0 +1,19 @@
+level=info msg=[[{
+	name: "PD(Generic Explicit)"
+	properties: {
+		name: "example of explicit value"
+	}
+	provisioner: "example resource type provisioner"
+	resource: {
+		type: "Example Resource Type"
+		properties: {
+			name: "example of explicit value"
+		}
+	}
+	system: {
+		type: "Example Provider"
+		properties: {
+			name: "Example Provider Instance"
+		}
+	}
+}]]

@@ -1,0 +1,15 @@
+---
+provisioners:
+  - provisioners/generic_create.cue
+providers:
+  - providers/generic_create.cue
+  - providers/generic_implicit_1.cue
+  - providers/generic_implicit_2.cue
+systems:
+  - type: Example Provider
+    properties:
+      name: Example Provider Instance
+resources:
+  - type: Example Resource Type
+    properties:
+      _name: Example # prefix underscore is implicit property identifier

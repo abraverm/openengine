@@ -1,0 +1,52 @@
+level=info msg=[[{
+	name: "R(a)PD(Generic Explicit)"
+	properties: {
+		name: "Example Resource A"
+	}
+	provisioner: "example resource type provisioner"
+	resource: {
+		type: "Example Resource Type"
+		name: "a"
+		properties: {
+			name: "Example Resource A"
+		}
+	}
+	system: {
+		type: "Example Provider"
+	}
+}, {
+	name: "R(b)PD(Generic Explicit)"
+	properties: {
+		name: "Example Resource B"
+	}
+	provisioner: "example resource type provisioner"
+	resource: {
+		type: "Example Resource Type"
+		name: "b"
+		properties: {
+			name: "Example Resource B"
+		}
+		solutions: [{
+			name: "R(a)PD(Generic Explicit)"
+			resource: {
+				type: "Example Resource Type"
+				name: "a"
+				properties: {
+					name: "Example Resource A"
+				}
+			}
+			system: {
+				type: "Example Provider"
+			}
+			provisioner: "example resource type provisioner"
+			properties: {
+				name: "Example Resource A"
+			}
+			resolved: true
+		}]
+		dependencies: ["a"]
+	}
+	system: {
+		type: "Example Provider"
+	}
+}]]
