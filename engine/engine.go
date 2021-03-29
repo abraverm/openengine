@@ -1,4 +1,5 @@
 // Package engine is the core of OpenEngine that generates solutions
+// nolint: wrapcheck
 package engine
 
 import (
@@ -147,7 +148,7 @@ func (e *Engine) Add(path, def, content string) error {
 	}
 
 	h := sha256.New()
-	h.Write([]byte(content)) // nolint: errcheck, gosec
+	h.Write([]byte(content)) // nolint: gosec
 	sha := hex.EncodeToString(h.Sum(nil))
 	source := fmt.Sprintf("\n%ss:\"%s\":%s\n", strings.ToLower(def), sha, content)
 
