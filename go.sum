@@ -1,6 +1,6 @@
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
-cuelang.org/go v0.4.0-alpha.1 h1:FUBWAt1v7VpCOT9EwfIsA+iFerM6+0c4Dp3eRM+UjKA=
-cuelang.org/go v0.4.0-alpha.1/go.mod h1:IDCcM/+MZjfpt6IypYE3uWkJVGRWHWqwvi2zwTKBtxI=
+cuelang.org/go v0.4.0-alpha.2 h1:lifRw7DYPNlCcuHltBxZgvqDEDtIiIX0RjW9cgSITKQ=
+cuelang.org/go v0.4.0-alpha.2/go.mod h1:IDCcM/+MZjfpt6IypYE3uWkJVGRWHWqwvi2zwTKBtxI=
 dmitri.shuralyov.com/gpu/mtl v0.0.0-20201218220906-28db891af037/go.mod h1:H6x//7gZCb22OMCxBHrMx7a5I7Hp++hsVxbQ4BYO7hU=
 github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
