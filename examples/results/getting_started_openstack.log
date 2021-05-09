@@ -9,8 +9,8 @@ level=info msg=[[{
 	resource: {
 		type: "Server"
 		properties: {
-			flavorRef: "m1.small"
 			imageRef:  "fedora31"
+			flavorRef: "m1.small"
 			name:      "example_server_name"
 		}
 	}

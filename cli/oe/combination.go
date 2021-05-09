@@ -105,7 +105,7 @@ func add(e *engine.Engine, obj interface{}, def, basepath string) {
 			break
 		}
 
-		err = e.Add(target, def, string(data))
+		err = e.Add(def, string(data))
 		if err != nil {
 			log.Errorf("unable to add %v %s:\n%v", def, target, err)
 		}

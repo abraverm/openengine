@@ -6,46 +6,10 @@ import (
 	"testing"
 	"time"
 
+	"cuelang.org/go/cue/cuecontext"
+
 	"github.com/nsf/jsondiff"
-
-	"cuelang.org/go/cue"
 )
-
-func TestEngine_Add(t *testing.T) {
-	type args struct {
-		path string
-		def  string
-	}
-	type test struct {
-		name    string
-		args    args
-		wantErr bool
-	}
-	tests := []test{
-		{"empty file", args{"testdata/empty.cue", "Resource"}, true},
-		{"empty resource", args{"testdata/empty_struct.cue", "Resource"}, true},
-		{"resource", args{"testdata/resource_minimal.cue", "Resource"}, false},
-		{"broken", args{"testdata/broken.cue", "Resource"}, true},
-		{"false resource", args{"testdata/false.cue", "Resource"}, true},
-		{"resource list", args{"testdata/resource_list.cue", "Resource"}, true}, //TODO: only one is acceptable per file
-		{"system", args{"testdata/system_minimal.cue", "System"}, false},
-		{"provider", args{"testdata/provider_minimal.cue", "Provider"}, false},
-		{"provisioner", args{"testdata/provisioner_minimal.cue", "Provisioner"}, false},
-	}
-	for i, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			e, _ := NewEngine("")
-			content, err := loadFile(tt.args.path)
-			if err != nil {
-				t.Errorf("Add() error = %v", err)
-			}
-			if err := e.Add(tt.args.path, tt.args.def, content); (err != nil) != tt.wantErr {
-				t.Errorf("Add() error = %v, wantErr %v", err, tt.wantErr)
-			}
-			t.Logf("[Add] completed test (%d/%d) - %s", i, len(tests), tt.name)
-		})
-	}
-}
 
 func TestEngine_AddResource(t *testing.T) {
 	type P map[string]interface{}
@@ -105,35 +69,11 @@ func TestEngine_addDefinition(t *testing.T) {
 	for i, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			e, _ := NewEngine("")
-			if err := e.addDefinition(tt.path, tt.definition); (err != nil) != tt.wantErr {
+			if err := e.addDefinition(tt.definition); (err != nil) != tt.wantErr {
 				t.Errorf("addDefinition() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 		t.Logf("[addDefinition] completed test (%d/%d) - %s", i, len(tests), tt.name)
-	}
-}
-
-func TestEngine_addObject(t *testing.T) {
-	type P map[string]interface{}
-	tests := []struct {
-		name    string
-		obj     interface{}
-		def     string
-		wantErr bool
-	}{
-		{"empty", "", "", true},
-		{"bad object", "", "Resource", true},
-		{"good object", Resource{"Server", "", P{"key": "value"}, System{"", P{}}, []string{}, []string{}}, "Resource", false},
-		{"bad definition", struct{ Bad string }{Bad: "test"}, "Provider", true},
-	}
-	for i, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			e, _ := NewEngine("")
-			if err := e.addObject(tt.obj, tt.def); (err != nil) != tt.wantErr {
-				t.Errorf("addObject() error = %v, wantErr %v", err, tt.wantErr)
-			}
-			t.Logf("[addObject] completed test (%d/%d) - %s", i, len(tests), tt.name)
-		})
 	}
 }
 
@@ -150,61 +90,11 @@ func TestEngine_loadSpec(t *testing.T) {
 	}
 	for i, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			e := &Engine{}
-			e.cue.runtime = &cue.Runtime{}
+			e, _ := NewEngine("")
 			if err := e.loadSpec(tt.path); (err != nil) != tt.wantErr {
 				t.Errorf("loadSpec() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			t.Logf("[loadSpec] completed test (%d/%d) - %s", i, len(tests), tt.name)
-		})
-	}
-}
-
-func TestEngine_validateRaw(t *testing.T) {
-	tests := []struct {
-		name    string
-		path    string
-		def     string
-		content string
-		wantErr bool
-	}{
-		{"unknown definition", "", "", "", true},
-		{"unknown definition", "", "asdfasfd", "", true},
-		{"empty", "", "#Resource", "", true},
-		{"random path", "asfdasdf", "#Resource", "{type: \"Server\"}", false},
-		{"bad content", "asfdasdf", "#Resource", "test:", true},
-		{"invalid content", "asfdasdf", "#Resource", "{wrong: true}", true},
-		{"valid content", "asfdasdf", "#Resource", "{type: \"Server\"}", false},
-	}
-	for i, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			e, _ := NewEngine("")
-			if err := e.validateRaw(tt.path, tt.def, tt.content); (err != nil) != tt.wantErr {
-				t.Errorf("validateRaw() error = %v, wantErr %v", err, tt.wantErr)
-			}
-			t.Logf("[validateRaw] completed test (%d/%d) - %s", i, len(tests), tt.name)
-		})
-	}
-}
-
-func TestEngine_validateValue(t *testing.T) {
-	tests := []struct {
-		name    string
-		value   cue.Value
-		def     string
-		wantErr bool
-	}{
-		{"empty", cue.Value{}, "", true},
-		{"empty value", cue.Value{}, "#Resource", true},
-		{"unknown Resource", cue.Value{}, "unknown", true},
-	}
-	for i, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			e, _ := NewEngine("")
-			if err := e.validateValue(tt.value, tt.def); (err != nil) != tt.wantErr {
-				t.Errorf("validateValue() error = %v, wantErr %v", err, tt.wantErr)
-			}
-			t.Logf("[validateValue] completed test (%d/%d) - %s", i, len(tests), tt.name)
 		})
 	}
 }
@@ -311,32 +201,32 @@ func (s SolutionTest) update(name, id, action, resource, provider, provisioner, 
 }
 
 func (s SolutionTest) merge(resources, providers, provisioners, systems []string) SolutionTest {
-	new := s
+	newS := s
 	for _, resource := range resources {
-		new.resources = append(new.resources, fmt.Sprintf("testdata/resource_%s.cue", resource))
+		newS.resources = append(newS.resources, fmt.Sprintf("testdata/resource_%s.cue", resource))
 	}
 	for _, provider := range providers {
-		new.providers = append(new.providers, fmt.Sprintf("testdata/provider_%s.cue", provider))
+		newS.providers = append(newS.providers, fmt.Sprintf("testdata/provider_%s.cue", provider))
 	}
 	for _, provisioner := range provisioners {
-		new.provisioners = append(new.provisioners, fmt.Sprintf("testdata/provisioner_%s.cue", provisioner))
+		newS.provisioners = append(newS.provisioners, fmt.Sprintf("testdata/provisioner_%s.cue", provisioner))
 	}
 	for _, system := range systems {
-		new.systems = append(new.systems, fmt.Sprintf("testdata/system_%s.cue", system))
+		newS.systems = append(newS.systems, fmt.Sprintf("testdata/system_%s.cue", system))
 	}
-	return new
+	return newS
 }
 
 func generateResource(name, rType bool) string {
-	new := "{\n"
+	newS := "{\n"
 	if name {
-		new += "name: \"Test\""
+		newS += "name: \"Test\""
 	}
 	if rType {
-		new += "type: \"Server\""
+		newS += "type: \"Server\""
 	}
-	new += "}"
-	return new
+	newS += "}"
+	return newS
 }
 
 // TODO: Complete other definition testing
@@ -352,9 +242,9 @@ func TestEngine_Spec(t *testing.T) {
 		t.Run("Resource validation", func(t *testing.T) {
 			r := generateResource(tt.name, tt.rType)
 			e, _ := NewEngine("")
-			err := e.Add("test", "Resource", r)
+			err := e.Add("Resource", r)
 			if (err != nil) != tt.wantErr {
-				t.Fatalf("Resource validation failed: %v, wanted Error %v", err, tt.wantErr)
+				t.Fatalf("Resource validation failed: %v, wanted Error %v\n%s", err, tt.wantErr, e.GetSpec())
 			}
 		})
 	}
@@ -373,7 +263,7 @@ func TestEngine_Spec(t *testing.T) {
 	} {
 		t.Run("Action validation", func(t *testing.T) {
 			e, _ := NewEngine("")
-			err := e.Add("test", "Action", "\""+tt.action+"\"")
+			err := e.Add("Action", "\""+tt.action+"\"")
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("Action validation failed: %v, wanted Error %v", err, tt.wantErr)
 			}
@@ -570,26 +460,26 @@ func runSolutionTests(t *testing.T, tests []SolutionTest) {
 			}
 			for _, path := range tt.resources {
 				def, _ := loadFile(path)
-				if err = e.Add(path, "Resource", def); err != nil {
+				if err = e.Add("Resource", def); err != nil {
 					errors = append(errors, fmt.Errorf("%s - %v", path, err))
 				}
 			}
 			for _, path := range tt.systems {
 				def, _ := loadFile(path)
-				if err = e.Add(path, "System", def); err != nil {
+				if err = e.Add("System", def); err != nil {
 					errors = append(errors, fmt.Errorf("%s - %v", path, err))
 				}
 			}
 			for _, path := range tt.providers {
 				def, _ := loadFile(path)
-				e.Add(path, "Provider", def)
-				if err = e.Add(path, "Provider", def); err != nil {
+				e.Add("Provider", def)
+				if err = e.Add("Provider", def); err != nil {
 					errors = append(errors, fmt.Errorf("%s - %v", path, err))
 				}
 			}
 			for _, path := range tt.provisioners {
 				def, _ := loadFile(path)
-				if err = e.Add(path, "Provisioner", def); err != nil {
+				if err = e.Add("Provisioner", def); err != nil {
 					errors = append(errors, fmt.Errorf("%s - %v", path, err))
 				}
 			}
@@ -597,12 +487,12 @@ func runSolutionTests(t *testing.T, tests []SolutionTest) {
 				for _, e := range errors {
 					t.Error(e)
 				}
-				t.Fatalf("%v", e.cue.spec)
+				t.Fatalf("%v", e.GetSpec())
 			}
 			want, _ := loadFile(tt.solutions)
-			r := cue.Runtime{}
-			wantInstance, _ := r.Compile("want", want)
-			wantJSON, err := wantInstance.Value().MarshalJSON()
+			c := cuecontext.New()
+			wantValue := c.CompileString(want)
+			wantJSON, err := wantValue.MarshalJSON()
 			if err != nil {
 				t.Fatalf("Unable to create want json:%v\n%s", err, wantJSON)
 			}
@@ -610,8 +500,8 @@ func runSolutionTests(t *testing.T, tests []SolutionTest) {
 			go func() {
 				got, err := e.Solutions(tt.action)
 				if (err != nil) != tt.wantErr {
-					t.Logf("Solutions() error = %v, wantErr %v, spec:\n %s", err, tt.wantErr, e.cue.spec)
-					t.Errorf("Solutions() error = %v, wantErr %v, spec:\n %s", err, tt.wantErr, e.cue.spec)
+					t.Logf("Solutions() error = %v, wantErr %v, spec:\n %s", err, tt.wantErr, e.GetSpec())
+					t.Errorf("Solutions() error = %v, wantErr %v, spec:\n %s", err, tt.wantErr, e.GetSpec())
 					return
 				}
 				c1 <- got
@@ -619,15 +509,15 @@ func runSolutionTests(t *testing.T, tests []SolutionTest) {
 
 			select {
 			case got := <-c1:
-				gotInstance, err := r.Compile("got", got)
-				if err != nil {
-					t.Fatalf("%v\nSpec:\n%s", err, e.cue.spec)
+				gotValue := c.CompileString(got)
+				if gotValue.Err() != nil {
+					t.Fatalf("%v\nSpec:\n%s", gotValue.Err(), e.GetSpec())
 				}
 
-				gotJSON, _ := gotInstance.Value().MarshalJSON()
+				gotJSON, _ := gotValue.MarshalJSON()
 				if result, diff := jsondiff.Compare(wantJSON, gotJSON, &jsondiffOpts); result.String() != "FullMatch" {
-					t.Logf("Got:\n%s\nDifference:\n%s\nSpec:\n%s", got, diff, e.cue.spec)
-					t.Fatalf("Got:\n%s\nDifference:\n%s\nSpec:\n%s", got, diff, e.cue.spec)
+					t.Logf("Got:\n%s\nDifference:\n%s\nSpec:\n%s", got, diff, e.GetSpec())
+					t.Fatalf("Got:\n%s\nDifference:\n%s\nSpec:\n%s", got, diff, e.GetSpec())
 				}
 				endTime := time.Now()
 				t.Logf("completed test (%d/%d) in %s - %s", i+1, len(tests), endTime.Sub(startTime).String(), tt.name)
