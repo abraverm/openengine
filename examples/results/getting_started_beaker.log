@@ -10,9 +10,9 @@ level=info msg=[[{
 	resource: {
 		type: "Server"
 		properties: {
-			arch:   "x86_64"
-			family: "rhel75"
 			method: "nfs"
+			family: "rhel75"
+			arch:   "x86_64"
 			name:   "example_server_name"
 		}
 	}

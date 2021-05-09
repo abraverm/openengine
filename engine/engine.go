@@ -15,11 +15,10 @@ import (
 	"strings"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/format"
-	"cuelang.org/go/encoding/gocode/gocodec"
 
 	//  to register builtins
-	_ "cuelang.org/go/pkg"
 	"golang.org/x/xerrors"
 )
 
@@ -30,12 +29,8 @@ var SPEC string
 
 // An Engine is the OpenEngine interface - all actions should be done using it.
 type Engine struct {
-	cue struct {
-		runtime  *cue.Runtime
-		instance *cue.Instance
-		codec    *gocodec.Codec
-		spec     string
-	}
+	context *cue.Context
+	value   cue.Value
 }
 
 func loadFile(path string) (string, error) {
@@ -59,7 +54,7 @@ func loadFile(path string) (string, error) {
 func (e *Engine) loadSpec(path string) error {
 	switch path {
 	case "":
-		if err := e.addDefinition("spec.cue", SPEC); err != nil {
+		if err := e.addDefinition(SPEC); err != nil {
 			return err
 		}
 
@@ -69,7 +64,7 @@ func (e *Engine) loadSpec(path string) error {
 			return err
 		}
 
-		if err := e.addDefinition("spec.cue", file); err != nil {
+		if err := e.addDefinition(file); err != nil {
 			return err
 		}
 	}
@@ -81,78 +76,24 @@ func (e *Engine) loadSpec(path string) error {
 func NewEngine(spec string) (*Engine, error) {
 	//TODO: there is no need for the sub struct "cue"
 	// nolint
-	e := Engine{}
-	e.cue.runtime = &cue.Runtime{}
-
+	e := Engine{context: cuecontext.New()}
 	if err := e.loadSpec(spec); err != nil {
 		return nil, err
 	}
 
-	e.cue.codec = gocodec.New(e.cue.runtime, nil)
-
 	return &e, nil
 }
 
-func (e *Engine) addDefinition(path string, definition string) error {
-	r := e.cue.runtime
+func (e *Engine) addDefinition(source string) error {
+	v := e.value.Unify(e.context.CompileString(source))
 
-	instance, err := r.Compile(path, e.cue.spec+definition)
-	if err != nil {
-		return fmt.Errorf("bad definition %s: %w", definition, err)
+	if v.Err() != nil {
+		return fmt.Errorf("bad definition %s: %w", source, v.Err())
 	}
 
-	e.cue.instance = instance
-	e.cue.runtime = r
-	e.cue.spec += definition
+	e.value = v
 
 	return nil
-}
-
-func (e Engine) validateValue(value cue.Value, def string) (err error) {
-	var x interface{}
-
-	defValue := e.cue.instance.LookupDef(def)
-	_ = e.cue.codec.Encode(value, &x)
-	err = e.cue.codec.Validate(defValue, x)
-
-	if _, err := defValue.Unify(value).MarshalJSON(); err != nil {
-		return fmt.Errorf("converting to JSON failed: %w", err)
-	}
-
-	return
-}
-
-func (e Engine) validateRaw(path, def, content string) error {
-	r := cue.Runtime{}
-
-	instance, err := r.Compile(path, content)
-	if err != nil {
-		return fmt.Errorf("failed to compile: %w", err)
-	}
-
-	return e.validateValue(instance.Value(), def)
-}
-
-// Add cue definition to engine.
-func (e *Engine) Add(path, def, content string) error {
-	if len(content) == 0 {
-		return xerrors.New("Content is empty")
-	}
-
-	re := regexp.MustCompile(`"_(.*)":`)
-	content = re.ReplaceAllString(content, "_${1}:")
-
-	defType := fmt.Sprintf("#%s", def)
-	if err := e.validateRaw(path, defType, content); err != nil {
-		return err
-	}
-
-	h := sha256.New()
-	h.Write([]byte(content)) // nolint: gosec
-	sha := hex.EncodeToString(h.Sum(nil))
-	source := fmt.Sprintf("\n%ss:\"%s\":%s\n", strings.ToLower(def), sha, content)
-
-	return e.addDefinition(path, source)
 }
 
 // System is a provider instance that contains matching values and other metadata such as credentials.
@@ -171,19 +112,56 @@ type Resource struct {
 	InterfacesDependencies []string               `json:"interfacesDependencies,omitempty"`
 }
 
-func (e *Engine) addObject(obj interface{}, def string) error {
-	defType := fmt.Sprintf("#%s", def)
-	defValue := e.cue.instance.LookupDef(defType)
-
-	objValue, _ := e.cue.codec.Decode(obj)
-
-	if err := defValue.Unify(objValue).Validate(); err != nil {
-		return fmt.Errorf("failed validation: %w", err)
+func (e Engine) verifyValue(def, content string) error {
+	v := e.context.CompileString(content)
+	if v.Err() != nil {
+		return v.Err()
 	}
 
-	objCue, _ := format.Node(objValue.Syntax())
+	defV := e.value.LookupPath(cue.ParsePath(fmt.Sprintf("#%s", def)))
 
-	return e.Add("i wonder", def, string(objCue))
+	vTest := defV.Unify(v)
+	if vTest.Err() != nil {
+		return vTest.Err()
+	}
+
+	if _, err := vTest.MarshalJSON(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Add cue definition to engine.
+func (e *Engine) Add(def, content string) error {
+	if len(content) == 0 {
+		return xerrors.New("Content is empty")
+	}
+
+	re := regexp.MustCompile(`"_(.*)":`)
+	content = re.ReplaceAllString(content, "_${1}:")
+
+	if err := e.verifyValue(def, content); err != nil {
+		return err
+	}
+
+	h := sha256.New()
+	h.Write([]byte(content)) // nolint: gosec
+	sha := hex.EncodeToString(h.Sum(nil))
+	source := fmt.Sprintf("\n%ss:\"%s\":%s\n", strings.ToLower(def), sha, content)
+
+	return e.addDefinition(source)
+}
+
+func (e *Engine) addObject(obj interface{}, def string) error {
+	v := e.context.Encode(obj)
+	if v.Err() != nil {
+		return v.Err()
+	}
+
+	source, _ := format.Node(v.Syntax())
+
+	return e.Add(def, string(source))
 }
 
 // AddSystem adds system to Engine.
@@ -198,23 +176,19 @@ func (e *Engine) AddResource(resource Resource) error {
 
 // Solutions is the Engine purpose.
 func (e *Engine) Solutions(action string) (results string, err error) {
-	actionValue := e.cue.instance.Lookup("ACTION")
-	if err := e.cue.codec.Validate(actionValue, action); err != nil {
-		return "[]", fmt.Errorf("invalid action: %w", err)
+	v := e.value.FillPath(cue.ParsePath("ACTION"), action)
+	if v.Err() != nil {
+		return "[]", v.Err()
 	}
 
-	instance, _ := e.cue.instance.Fill(action, "ACTION")
-	instanceCue, _ := format.Node(instance.Value().Syntax(cue.All()))
-	solutions := instance.Lookup("DependencyGroupsSolutionsDecoupled")
+	vCue, _ := format.Node(v.Syntax(cue.All()))
+	solutions := v.LookupPath(cue.ParsePath("DependencyGroupsSolutionsDecoupled"))
 
-	result, err := format.Node(solutions.Syntax(cue.Concrete(true)))
-	if err != nil {
-		return "", fmt.Errorf("specification failure: %w", err)
+	if solutions.Err() != nil {
+		return string(vCue), solutions.Err()
 	}
 
-	if strings.Contains(string(result), "_|_") {
-		return string(instanceCue), xerrors.New(string(result))
-	}
+	result, _ := format.Node(solutions.Syntax(cue.Concrete(true)))
 
 	reEmpty := regexp.MustCompile("(?m)[\r\n]+^.*: (\\[]|{})")
 	empty := reEmpty.ReplaceAllString(string(result), "")
@@ -226,5 +200,7 @@ func (e *Engine) Solutions(action string) (results string, err error) {
 
 // GetSpec return engine current specification for debugging.
 func (e Engine) GetSpec() string {
-	return e.cue.spec
+	spec, _ := format.Node(e.value.Syntax(cue.All()))
+
+	return string(spec)
 }
