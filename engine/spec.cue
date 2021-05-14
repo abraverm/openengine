@@ -61,7 +61,7 @@ import "strings"
   disabledInterfaces: [...string]
   dependedProperties:[string]: { // Implicit dependency with direcrt reference
     resourceName: string
-    response: {...#Property}
+    response: #Properties
     resolved: len(solutions & [...{ resource:name: resourceName, response: response}]) > 0
   }
 }
