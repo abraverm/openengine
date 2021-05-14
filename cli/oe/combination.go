@@ -1,5 +1,5 @@
 // Package common contains shared functions, types and const used by oe commands
-// nolint: forcetypeassert, wrapcheck
+// nolint: forcetypeassert
 package main
 
 import (
