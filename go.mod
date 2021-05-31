@@ -3,7 +3,7 @@ module github.com/abraverm/openengine
 go 1.16
 
 require (
-	cuelang.org/go v0.4.0-beta.2
+	cuelang.org/go v0.4.0
 	github.com/goccy/go-yaml v1.8.0
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/nsf/jsondiff v0.0.0-20200515183724-f29ed568f4ce
